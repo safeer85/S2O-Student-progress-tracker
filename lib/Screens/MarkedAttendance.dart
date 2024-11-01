@@ -83,6 +83,70 @@ class _MarkedAttendanceListPageState extends State<MarkedAttendanceListPage> {
       if (sessionSnapshot.exists) {
         Map<String, dynamic> data =
             sessionSnapshot.data() as Map<String, dynamic>;
+        Map<String, dynamic> attendanceStatus =
+            data['attendanceStatus'] as Map<String, dynamic>;
+
+        List<Map<String, dynamic>> tempRecords = [];
+
+        for (var entry in attendanceStatus.entries) {
+          String studentId = entry.key;
+          bool status = entry.value;
+
+          // Fetch student name from Users collection using studentId
+          DocumentSnapshot userSnapshot =
+              await _firestore.collection('users').doc(studentId).get();
+
+          if (userSnapshot.exists) {
+            String studentName = (userSnapshot.data()
+                    as Map<String, dynamic>)['name with initial'] ??
+                'Unknown';
+
+            //String studentName = userSnapshot.data()?['name with initial'] ?? 'Unknown';
+
+            tempRecords.add({
+              'studentId': studentId,
+              'studentName': studentName,
+              'status': status ? 'Present' : 'Absent',
+            });
+          } else {
+            // If user does not exist, add with 'Unknown' name
+            tempRecords.add({
+              'studentId': studentId,
+              'studentName': 'Unknown',
+              'status': status ? 'Present' : 'Absent',
+            });
+          }
+        }
+
+        setState(() {
+          attendanceRecords = tempRecords;
+        });
+      } else {
+        setState(() {
+          attendanceRecords = [];
+        });
+      }
+    } catch (error) {
+      print("Error fetching attendance records: $error");
+    }
+  }
+
+  /* Future<void> _fetchAttendanceRecords() async {
+    if (selectedDate == null || selectedTime == null || teacherName == null)
+      return;
+
+    sessionId =
+        "${selectedDate!.toIso8601String()}_${selectedTime!.format(context)}_${teacherName}";
+
+    try {
+      DocumentSnapshot sessionSnapshot = await _firestore
+          .collection('attendance_sessions')
+          .doc(sessionId)
+          .get();
+
+      if (sessionSnapshot.exists) {
+        Map<String, dynamic> data =
+            sessionSnapshot.data() as Map<String, dynamic>;
         // Safely cast each entry in the attendanceStatus map to ensure it's a Map<String, bool>
         Map<String, bool> attendanceStatus =
             (data['attendanceStatus'] as Map<String, dynamic>)
@@ -107,7 +171,7 @@ class _MarkedAttendanceListPageState extends State<MarkedAttendanceListPage> {
     } catch (error) {
       print("Error fetching attendance records: $error");
     }
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
