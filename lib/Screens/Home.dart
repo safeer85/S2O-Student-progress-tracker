@@ -47,6 +47,13 @@ class HomePage extends StatelessWidget {
                 },
                 child: const Text('announcement'),
               ),
+              ElevatedButton(
+                onPressed: () {
+                  // Navigate to take attendance page
+                  Navigator.pushNamed(context, AppRoutes.announcementlist);
+                },
+                child: const Text('announcementlist'),
+              ),
             ],
             if (role == 'Parent') ...[
               ElevatedButton(
