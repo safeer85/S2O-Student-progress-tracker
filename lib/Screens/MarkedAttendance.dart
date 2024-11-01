@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class MarkedAttendanceListPage extends StatefulWidget {
@@ -12,11 +11,9 @@ class MarkedAttendanceListPage extends StatefulWidget {
 class _MarkedAttendanceListPageState extends State<MarkedAttendanceListPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  DateTime? selectedDate;
-  TimeOfDay? selectedTime;
   String? teacherName;
-  String? sessionId; // Unique ID for each attendance session
-  List<Map<String, dynamic>> attendanceRecords = [];
+  List<Map<String, dynamic>> attendanceSessions =
+      []; // To hold attendance sessions
 
   @override
   void initState() {
@@ -28,151 +25,142 @@ class _MarkedAttendanceListPageState extends State<MarkedAttendanceListPage> {
     String? teacherId = _auth.currentUser?.uid;
 
     if (teacherId != null) {
-      DocumentSnapshot teacherSnapshot =
-          await _firestore.collection('users').doc(teacherId).get();
+      try {
+        DocumentSnapshot teacherSnapshot =
+            await _firestore.collection('users').doc(teacherId).get();
 
-      setState(() {
-        teacherName = teacherSnapshot['name with initial'];
-      });
+        if (teacherSnapshot.exists) {
+          setState(() {
+            teacherName = teacherSnapshot[
+                'name with initial']; // Fetch the teacher's name
+          });
+          _fetchAttendanceSessions(); // Fetch attendance sessions after getting the name
+        }
+      } catch (error) {
+        print("Error fetching teacher name: $error");
+      }
     }
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (pickedDate != null && pickedDate != selectedDate) {
-      setState(() {
-        selectedDate = pickedDate;
-        selectedTime = null; // Reset time if date is changed
-        attendanceRecords = [];
-      });
-    }
-  }
-
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? pickedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (pickedTime != null && pickedTime != selectedTime) {
-      setState(() {
-        selectedTime = pickedTime;
-        attendanceRecords = [];
-      });
-      _fetchAttendanceRecords();
-    }
-  }
-
-  Future<void> _fetchAttendanceRecords() async {
-    if (selectedDate == null || selectedTime == null || teacherName == null)
-      return;
-
-    sessionId =
-        "${selectedDate!.toIso8601String()}_${selectedTime!.format(context)}_${teacherName}";
+  Future<void> _fetchAttendanceSessions() async {
+    if (teacherName == null) return;
 
     try {
-      DocumentSnapshot sessionSnapshot = await _firestore
+      // Fetch all attendance sessions for the logged-in teacher using their name
+      QuerySnapshot sessionSnapshot = await _firestore
           .collection('attendance_sessions')
-          .doc(sessionId)
+          .where('teacherName', isEqualTo: teacherName)
           .get();
 
-      if (sessionSnapshot.exists) {
-        Map<String, dynamic> data =
-            sessionSnapshot.data() as Map<String, dynamic>;
-        Map<String, dynamic> attendanceStatus =
-            data['attendanceStatus'] as Map<String, dynamic>;
+      List<Map<String, dynamic>> tempSessions = [];
 
-        List<Map<String, dynamic>> tempRecords = [];
-
-        for (var entry in attendanceStatus.entries) {
-          String studentId = entry.key;
-          bool status = entry.value;
-
-          // Fetch student name from Users collection using studentId
-          DocumentSnapshot userSnapshot =
-              await _firestore.collection('users').doc(studentId).get();
-
-          if (userSnapshot.exists) {
-            String studentName = (userSnapshot.data()
-                    as Map<String, dynamic>)['name with initial'] ??
-                'Unknown';
-
-            tempRecords.add({
-              'studentId': studentId,
-              'studentName': studentName,
-              'status': status ? 'Present' : 'Absent',
-            });
-          } else {
-            // If user does not exist, add with 'Unknown' name
-            tempRecords.add({
-              'studentId': studentId,
-              'studentName': 'Unknown',
-              'status': status ? 'Present' : 'Absent',
-            });
-          }
-        }
-
-        setState(() {
-          attendanceRecords = tempRecords;
-        });
-      } else {
-        setState(() {
-          attendanceRecords = [];
+      for (var doc in sessionSnapshot.docs) {
+        tempSessions.add({
+          'sessionId': doc.id,
+          'date': doc['date'],
+          'startTime': doc['startTime'],
+          'endTime': doc['endTime'],
+          'attendanceStatus': doc['attendanceStatus'],
         });
       }
+
+      setState(() {
+        attendanceSessions = tempSessions; // Update state with sessions
+      });
     } catch (error) {
-      print("Error fetching attendance records: $error");
+      print("Error fetching attendance sessions: $error");
     }
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchAttendanceRecords(
+      Map<String, dynamic> session) async {
+    List<Map<String, dynamic>> tempRecords = [];
+    Map<String, dynamic> attendanceStatus = session['attendanceStatus'];
+
+    for (var entry in attendanceStatus.entries) {
+      String studentId = entry.key;
+      bool status = entry.value;
+
+      // Fetch student name from Users collection using studentId
+      DocumentSnapshot userSnapshot =
+          await _firestore.collection('users').doc(studentId).get();
+
+      if (userSnapshot.exists) {
+        String studentName = (userSnapshot.data()
+                as Map<String, dynamic>)['name with initial'] ??
+            'Unknown';
+
+        tempRecords.add({
+          'studentId': studentId,
+          'studentName': studentName,
+          'status': status ? 'Present' : 'Absent',
+        });
+      } else {
+        // If user does not exist, add with 'Unknown' name
+        tempRecords.add({
+          'studentId': studentId,
+          'studentName': 'Unknown',
+          'status': status ? 'Present' : 'Absent',
+        });
+      }
+    }
+
+    return tempRecords;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Marked Attendance")),
-      body: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextButton(
-                onPressed: () => _selectDate(context),
-                child: Text(
-                  selectedDate == null
-                      ? 'Select Date'
-                      : DateFormat('yyyy-MM-dd').format(selectedDate!),
-                ),
-              ),
-              TextButton(
-                onPressed:
-                    selectedDate != null ? () => _selectTime(context) : null,
-                child: Text(
-                  selectedTime == null
-                      ? 'Select Start Time'
-                      : selectedTime!.format(context),
-                ),
-              ),
-            ],
-          ),
-          Expanded(
-            child: attendanceRecords.isEmpty
-                ? Center(child: Text("No attendance records for this session."))
-                : ListView.builder(
-                    itemCount: attendanceRecords.length,
-                    itemBuilder: (context, index) {
-                      final record = attendanceRecords[index];
-                      return ListTile(
-                        title: Text("Student Name: ${record['studentName']}"),
-                        subtitle: Text("Status: ${record['status']}"),
-                      );
-                    },
-                  ),
-          ),
-        ],
-      ),
+      body: attendanceSessions.isEmpty
+          ? Center(
+              child:
+                  CircularProgressIndicator()) // Show loading indicator while fetching
+          : ListView.builder(
+              itemCount: attendanceSessions.length,
+              itemBuilder: (context, index) {
+                final session = attendanceSessions[index];
+                return ExpansionTile(
+                  title: Text("${session['date']}"),
+                  subtitle: Text(
+                      "Time: ${session['startTime']} - ${session['endTime']}"),
+                  children: [
+                    FutureBuilder<List<Map<String, dynamic>>>(
+                      future: _fetchAttendanceRecords(session),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text("Loading attendance records..."),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text("Error fetching records"),
+                          );
+                        } else {
+                          final attendanceRecords = snapshot.data!;
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: attendanceRecords.length,
+                            itemBuilder: (context, recordIndex) {
+                              final record = attendanceRecords[recordIndex];
+                              return ListTile(
+                                title: Text(
+                                    "Student Name: ${record['studentName']}"),
+                                subtitle: Text("Status: ${record['status']}"),
+                              );
+                            },
+                          );
+                        }
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
     );
   }
 }
