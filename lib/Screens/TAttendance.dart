@@ -169,16 +169,13 @@ class _AttendancePageState extends State<AttendancePage> {
         "${selectedDate!.toIso8601String()}_${startTime!.format(context)}_${teacherName}";
 
     try {
-      for (var student in students) {
-        await _firestore.collection('attendance_sessions').doc(sessionId).set({
-          'teacherName': teacherName,
-          'studentName': student['name'],
-          'date': DateFormat('yyyy-MM-dd').format(selectedDate!),
-          'startTime': startTime!.format(context),
-          'endTime': endTime!.format(context),
-          'attendanceStatus': attendanceStatus,
-        });
-      }
+      await _firestore.collection('attendance_sessions').doc(sessionId).set({
+        'teacherName': teacherName,
+        'date': DateFormat('yyyy-MM-dd').format(selectedDate!),
+        'startTime': startTime!.format(context),
+        'endTime': endTime!.format(context),
+        'attendanceStatus': attendanceStatus,
+      });
 
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Attendance saved successfully")));
