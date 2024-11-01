@@ -40,6 +40,13 @@ class HomePage extends StatelessWidget {
                 },
                 child: const Text('See Recorded Attendance'),
               ),
+              ElevatedButton(
+                onPressed: () {
+                  // Navigate to take attendance page
+                  Navigator.pushNamed(context, AppRoutes.announcement);
+                },
+                child: const Text('announcement'),
+              ),
             ],
             if (role == 'Parent') ...[
               ElevatedButton(

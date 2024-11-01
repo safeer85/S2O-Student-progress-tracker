@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:s20/Screens/Announcement.dart';
 import 'package:s20/Screens/MarkedAttendance.dart';
 import 'package:s20/Screens/Register.dart';
 import 'package:s20/Screens/SplashScreen.dart';
@@ -12,6 +13,7 @@ class AppRoutes {
   static const String register = '/register';
   static const String takeAttendance = '/takeAttendance';
   static const String markedAttendance = '/markedAttendance';
+  static const String announcement = '/announcement';
 
   static Map<String, WidgetBuilder> routes = {
     splash: (context) => const SplashScreen(),
@@ -19,6 +21,7 @@ class AppRoutes {
     login: (context) => LoginPage(),
     register: (context) => RegisterPage(),
     takeAttendance: (context) => AttendancePage(),
-    markedAttendance: (context) => MarkedAttendanceListPage()
+    markedAttendance: (context) => MarkedAttendanceListPage(),
+    announcement: (context) => CreateAnnouncementPage(),
   };
 }
