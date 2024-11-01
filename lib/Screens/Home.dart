@@ -4,7 +4,7 @@ import 'package:s20/Routes/routes.dart';
 class HomePage extends StatelessWidget {
   final String role;
 
-  const HomePage({Key? key, required this.role}) : super(key: key);
+  const HomePage({super.key, required this.role});
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +46,7 @@ class HomePage extends StatelessWidget {
                 onPressed: () {
                   // Navigate to view child's progress
                 },
-                child: Text("View Child's Progress"),
+                child: const Text("View Child's Progress"),
               ),
             ],
             if (role == 'Principal') ...[
@@ -54,7 +54,7 @@ class HomePage extends StatelessWidget {
                 onPressed: () {
                   // Navigate to the principal's dashboard
                 },
-                child: Text("Principal Dashboard"),
+                child: const Text("Principal Dashboard"),
               ),
             ],
           ],
