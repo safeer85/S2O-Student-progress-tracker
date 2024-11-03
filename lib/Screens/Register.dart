@@ -16,12 +16,13 @@ class _RegisterPageState extends State<RegisterPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
-  final streamController = TextEditingController();
   final childNameController = TextEditingController();
-  final subjectController = TextEditingController();
+  final subjectController =
+      TextEditingController(); // Keep the controller for potential use
 
   String? selectedRole;
   String? selectedStream;
+  String? selectedSubject; // New variable for selected subject
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -53,7 +54,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               TextFormField(
                 controller: Name_initialController,
-                decoration: InputDecoration(labelText: 'Name with initial'),
+                decoration: InputDecoration(labelText: 'Name with Initial'),
                 validator: (value) => value == null || value.isEmpty
                     ? 'Please enter your username'
                     : null,
@@ -90,7 +91,10 @@ class _RegisterPageState extends State<RegisterPage> {
                     .map((role) =>
                         DropdownMenuItem(value: role, child: Text(role)))
                     .toList(),
-                onChanged: (value) => setState(() => selectedRole = value),
+                onChanged: (value) => setState(() {
+                  selectedRole = value;
+                  selectedSubject = null; // Reset subject when role changes
+                }),
                 validator: (value) =>
                     value == null ? 'Please select a role' : null,
               ),
@@ -118,12 +122,21 @@ class _RegisterPageState extends State<RegisterPage> {
                       : null,
                 ),
               if (selectedRole == 'Teacher')
-                TextFormField(
-                  controller: subjectController,
+                DropdownButtonFormField<String>(
                   decoration: InputDecoration(labelText: 'Subject'),
-                  validator: (value) => value == null || value.isEmpty
-                      ? 'Please enter the subject you teach'
-                      : null,
+                  value: selectedSubject,
+                  items: [
+                    'Biology',
+                    'Physics',
+                    'Chemistry',
+                    'Combined Mathematics'
+                  ]
+                      .map((subject) => DropdownMenuItem(
+                          value: subject, child: Text(subject)))
+                      .toList(),
+                  onChanged: (value) => setState(() => selectedSubject = value),
+                  validator: (value) =>
+                      value == null ? 'Please select a subject' : null,
                 ),
               SizedBox(height: 20),
               ElevatedButton(
@@ -152,9 +165,8 @@ class _RegisterPageState extends State<RegisterPage> {
                         'childName': selectedRole == 'Parent'
                             ? childNameController.text
                             : null,
-                        'subject': selectedRole == 'Teacher'
-                            ? subjectController.text
-                            : null,
+                        'subject':
+                            selectedRole == 'Teacher' ? selectedSubject : null,
                       });
 
                       print(
@@ -182,9 +194,8 @@ class _RegisterPageState extends State<RegisterPage> {
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
-    streamController.dispose();
     childNameController.dispose();
-    subjectController.dispose();
+    subjectController.dispose(); // Dispose of the subject controller as well
     super.dispose();
   }
 }
