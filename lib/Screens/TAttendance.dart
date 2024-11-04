@@ -142,7 +142,7 @@ class _AttendancePageState extends State<AttendancePage> {
 
   Future<void> _saveAttendance() async {
     if (selectedDate == null || startTime == null || endTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Please select date, start time, and end time")));
       return;
     }
@@ -160,8 +160,8 @@ class _AttendancePageState extends State<AttendancePage> {
       setState(() {
         isWithinTimeWindow = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Cannot edit attendance after end time")));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Cannot edit attendance after end time")));
       return;
     }
 
@@ -178,7 +178,7 @@ class _AttendancePageState extends State<AttendancePage> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Attendance saved successfully")));
+          const SnackBar(content: Text("Attendance saved successfully")));
     } catch (error) {
       print("Error saving attendance: $error");
     }
@@ -188,7 +188,7 @@ class _AttendancePageState extends State<AttendancePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Take Attendance"),
+        title: const Text("Take Attendance"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -217,7 +217,7 @@ class _AttendancePageState extends State<AttendancePage> {
               ],
             ),
             isLoading
-                ? Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator())
                 : Expanded(
                     child: ListView.builder(
                       itemCount: students.length,
@@ -241,7 +241,7 @@ class _AttendancePageState extends State<AttendancePage> {
                   ),
             ElevatedButton(
               onPressed: isWithinTimeWindow ? _saveAttendance : null,
-              child: Text("Save Attendance"),
+              child: const Text("Save Attendance"),
             ),
           ],
         ),
