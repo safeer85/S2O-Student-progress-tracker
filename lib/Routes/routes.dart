@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:s20/Screens/Announcement.dart';
 import 'package:s20/Screens/AnnouncementList.dart';
+import 'package:s20/Screens/Exam.dart';
 import 'package:s20/Screens/MarkedAttendance.dart';
 import 'package:s20/Screens/Register.dart';
 import 'package:s20/Screens/SplashScreen.dart';
@@ -16,6 +17,7 @@ class AppRoutes {
   static const String markedAttendance = '/markedAttendance';
   static const String announcement = '/announcement';
   static const String announcementlist = '/announcementlist';
+  static const String examMarks = '/examMarks';
 
   static Map<String, WidgetBuilder> routes = {
     splash: (context) => const SplashScreen(),
@@ -25,6 +27,7 @@ class AppRoutes {
     takeAttendance: (context) => AttendancePage(),
     markedAttendance: (context) => MarkedAttendanceListPage(),
     announcement: (context) => CreateAnnouncementPage(),
-    announcementlist: (context) => AnnouncementsListPage()
+    announcementlist: (context) => AnnouncementsListPage(),
+    // examMarks: (context) => ExamMarksEntryPage(teacherName: 'YourTeacherName')
   };
 }
