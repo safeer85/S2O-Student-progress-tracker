@@ -99,6 +99,7 @@ class _HomePageState extends State<HomePage> {
               ElevatedButton.icon(
                 onPressed: () {
                   // Navigate to view attendance page
+                  Navigator.pushNamed(context, AppRoutes.viewAttendance);
                 },
                 icon: const Icon(Icons.visibility),
                 label: const Text("View Attendance"),
@@ -156,6 +157,35 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ],
+            if (widget.role == 'Student' || widget.role == 'Parent') ...[
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pushNamed(context, AppRoutes.viewAnnouncement);
+                },
+                icon: const Icon(Icons.announcement),
+                label: const Text('View Announcement'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 15),
+              /*ElevatedButton.icon(
+                onPressed: () {
+                  //Navigator.pushNamed(context, AppRoutes.announcementlist);
+                },
+                icon: const Icon(Icons.list),
+                label: const Text('View Announcements List'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),*/
+            ],
           ],
         ),
       ),
@@ -195,6 +225,21 @@ class _HomePageState extends State<HomePage> {
                 },
                 icon: const Icon(Icons.task),
                 label: const Text("Enter Exam Marks"),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ],
+            if (widget.role == 'Parent') ...[
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pushNamed(context, AppRoutes.viewchildmarks);
+                },
+                icon: const Icon(Icons.task),
+                label: const Text("View your Children Marks"),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 15),
                   shape: RoundedRectangleBorder(

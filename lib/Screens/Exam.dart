@@ -136,14 +136,43 @@ class _ExamMarksEntryPageState extends State<ExamMarksEntryPage> {
             const SizedBox(height: 20),
 
             // Exam Date input
+            // Exam Date input with Date Picker
             TextFormField(
+              controller: examDateController,
+              decoration: const InputDecoration(
+                labelText: 'Exam Date',
+                hintText: 'YYYY-MM-DD',
+                border: OutlineInputBorder(),
+                suffixIcon:
+                    Icon(Icons.calendar_today), // Calendar icon for clarity
+              ),
+              readOnly:
+                  true, // Make the field read-only to prevent manual editing
+              onTap: () async {
+                DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(2000), // Earliest selectable date
+                  lastDate: DateTime(2100), // Latest selectable date
+                );
+
+                if (pickedDate != null) {
+                  // Format the date as YYYY-MM-DD and set it in the controller
+                  String formattedDate =
+                      "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+                  examDateController.text = formattedDate;
+                }
+              },
+            ),
+
+            /* TextFormField(
               controller: examDateController,
               decoration: const InputDecoration(
                 labelText: 'Exam Date (YYYY-MM-DD)',
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.datetime,
-            ),
+            ),*/
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _saveMarks,
