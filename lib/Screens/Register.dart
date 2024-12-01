@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:animate_do/animate_do.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -30,165 +31,234 @@ class _RegisterPageState extends State<RegisterPage> {
       appBar: AppBar(
         title: Text("Register"),
         centerTitle: true,
-        backgroundColor: const Color.fromARGB(
-            255, 5, 158, 229), // Using your specified color
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF36D1DC), Color(0xFF5B86E5)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         elevation: 0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : Form(
-                key: _formKey,
-                child: ListView(
-                  children: [
-                    _buildTextField(
-                        firstNameController, 'First Name', Icons.person),
-                    _buildTextField(
-                        lastNameController, 'Last Name', Icons.person),
-                    _buildTextField(nameInitialController, 'Name with Initial',
-                        Icons.person_outline),
-                    _buildTextField(emailController, 'Email', Icons.email),
-                    _buildTextField(passwordController, 'Password', Icons.lock,
-                        obscureText: true),
-                    _buildTextField(confirmPasswordController,
-                        'Confirm Password', Icons.lock,
-                        obscureText: true),
-                    _buildRoleDropdown(),
-                    if (selectedRole == 'Student') _buildStreamDropdown(),
-                    if (selectedRole == 'Parent') _buildChildNameField(),
-                    if (selectedRole == 'Teacher') _buildSubjectDropdown(),
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: _register,
-                      child: Text('Register'),
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
-                        backgroundColor: const Color.fromARGB(
-                            255, 5, 158, 229), // Using your specified color
-                      ),
-                    ),
-                  ],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFF5F7FA), Color(0xFFD7E1EC)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : Form(
+            key: _formKey,
+            child: ListView(
+              children: [
+                ZoomIn(
+                  child: _buildTitle(),
                 ),
-              ),
+                FadeInUp(
+                  delay: Duration(milliseconds: 200),
+                  child: _buildCard(
+                      'First Name', firstNameController, Icons.person),
+                ),
+                FadeInUp(
+                  delay: Duration(milliseconds: 300),
+                  child: _buildCard(
+                      'Last Name', lastNameController, Icons.person),
+                ),
+                FadeInUp(
+                  delay: Duration(milliseconds: 400),
+                  child: _buildCard('Name with Initial',
+                      nameInitialController, Icons.person_outline),
+                ),
+                FadeInUp(
+                  delay: Duration(milliseconds: 500),
+                  child:
+                  _buildCard('Email', emailController, Icons.email),
+                ),
+                FadeInUp(
+                  delay: Duration(milliseconds: 600),
+                  child: _buildCard('Password', passwordController,
+                      Icons.lock,
+                      obscureText: true),
+                ),
+                FadeInUp(
+                  delay: Duration(milliseconds: 700),
+                  child: _buildCard('Confirm Password',
+                      confirmPasswordController, Icons.lock,
+                      obscureText: true),
+                ),
+                FadeInUp(
+                  delay: Duration(milliseconds: 800),
+                  child: _buildRoleDropdown(),
+                ),
+                if (selectedRole == 'Student')
+                  FadeInUp(
+                    delay: Duration(milliseconds: 900),
+                    child: _buildStreamDropdown(),
+                  ),
+                if (selectedRole == 'Parent')
+                  FadeInUp(
+                    delay: Duration(milliseconds: 1000),
+                    child: _buildChildNameField(),
+                  ),
+                if (selectedRole == 'Teacher')
+                  FadeInUp(
+                    delay: Duration(milliseconds: 1100),
+                    child: _buildSubjectDropdown(),
+                  ),
+                SizedBox(height: 20),
+                Bounce(
+                  delay: Duration(milliseconds: 1200),
+                  child: ElevatedButton(
+                    onPressed: _register,
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      elevation: 5,
+                      backgroundColor: Color(0xFF5B86E5),
+                    ),
+                    child: Text(
+                      'Register',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildTextField(
-      TextEditingController controller, String label, IconData icon,
-      {bool obscureText = false}) {
+  Widget _buildTitle() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-        SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          decoration: InputDecoration(
-            prefixIcon: Icon(icon,
-                color: const Color.fromARGB(
-                    255, 5, 158, 229)), // Consistent icon color
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            filled: true,
-            fillColor: Colors.grey[200],
-          ),
-          obscureText: obscureText,
-          validator: (value) => value == null || value.isEmpty
-              ? 'Please enter your $label'
-              : null,
+        Icon(Icons.app_registration, size: 80, color: Color(0xFF5B86E5)),
+        SizedBox(height: 16),
+        Text(
+          "Register Account",
+          style: TextStyle(
+              fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
         ),
         SizedBox(height: 16),
       ],
+    );
+  }
+
+  Widget _buildCard(String label, TextEditingController controller,
+      IconData icon, {bool obscureText = false}) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: TextFormField(
+          controller: controller,
+          obscureText: obscureText,
+          decoration: InputDecoration(
+            labelText: label,
+            prefixIcon: Icon(icon, color: Color(0xFF5B86E5)),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            filled: true,
+            fillColor: Colors.white,
+          ),
+          validator: (value) =>
+          value == null || value.isEmpty ? 'Please enter your $label' : null,
+        ),
+      ),
     );
   }
 
   Widget _buildRoleDropdown() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('Role',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 8),
-        DropdownButtonFormField<String>(
-          decoration: InputDecoration(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            filled: true,
-            fillColor: Colors.grey[200],
-          ),
-          value: selectedRole,
-          items: ['Student', 'Teacher', 'Parent', 'Principal']
-              .map((role) => DropdownMenuItem(value: role, child: Text(role)))
-              .toList(),
-          onChanged: (value) => setState(() {
-            selectedRole = value;
-            selectedStream = null;
-          }),
-          validator: (value) => value == null ? 'Please select a role' : null,
-        ),
-        const SizedBox(height: 16),
-      ],
+    return _buildDropdown(
+      'Role',
+      Icons.people,
+      selectedRole,
+      ['Student', 'Teacher', 'Parent', 'Principal'],
+          (value) {
+        setState(() {
+          selectedRole = value;
+          selectedStream = null;
+        });
+      },
     );
   }
 
   Widget _buildStreamDropdown() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('Stream',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 8),
-        DropdownButtonFormField<String>(
+    return _buildDropdown(
+      'Stream',
+      Icons.school,
+      selectedStream,
+      ['Physical Science', 'Biological Science'],
+          (value) => setState(() => selectedStream = value),
+    );
+  }
+
+  Widget _buildSubjectDropdown() {
+    return _buildDropdown(
+      'Subject',
+      Icons.book,
+      selectedSubject,
+      ['Biology', 'Physics', 'Chemistry', 'Combined Mathematics'],
+          (value) => setState(() => selectedSubject = value),
+    );
+  }
+
+  Widget _buildDropdown(String label, IconData icon, String? value,
+      List<String> items, void Function(String?) onChanged) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: DropdownButtonFormField<String>(
           decoration: InputDecoration(
+            labelText: label,
+            prefixIcon: Icon(icon, color: Color(0xFF5B86E5)),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             filled: true,
-            fillColor: Colors.grey[200],
+            fillColor: Colors.white,
           ),
-          value: selectedStream,
-          items: ['Physical Science', 'Biological Science']
-              .map((stream) =>
-                  DropdownMenuItem(value: stream, child: Text(stream)))
+          value: value,
+          items: items
+              .map((item) => DropdownMenuItem(value: item, child: Text(item)))
               .toList(),
-          onChanged: (value) => setState(() => selectedStream = value),
-          validator: (value) => value == null ? 'Please select a stream' : null,
+          onChanged: onChanged,
+          validator: (value) => value == null ? 'Please select a $label' : null,
         ),
-        const SizedBox(height: 16),
-      ],
+      ),
     );
   }
 
   Widget _buildChildNameField() {
-    return _buildTextField(
-        childNameController, 'Child/Children\'s Name(s)', Icons.child_care);
+    return _buildCard(
+        'Child/Children\'s Name(s)', childNameController, Icons.child_care);
   }
 
-  Widget _buildSubjectDropdown() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Subject',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-        SizedBox(height: 8),
-        DropdownButtonFormField<String>(
-          decoration: InputDecoration(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            filled: true,
-            fillColor: Colors.grey[200],
-          ),
-          value: selectedSubject,
-          items: ['Biology', 'Physics', 'Chemistry', 'Combined Mathematics']
-              .map((subject) =>
-                  DropdownMenuItem(value: subject, child: Text(subject)))
-              .toList(),
-          onChanged: (value) => setState(() => selectedSubject = value),
-          validator: (value) =>
-              value == null ? 'Please select a subject' : null,
-        ),
-        SizedBox(height: 16),
-      ],
+  Widget _buildSubmitButton() {
+    return ElevatedButton(
+      onPressed: _register,
+      style: ElevatedButton.styleFrom(
+        padding: EdgeInsets.symmetric(vertical: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        elevation: 5,
+        backgroundColor: Color(0xFF5B86E5),
+      ),
+      child: Text(
+        'Register',
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+      ),
     );
   }
 
@@ -197,27 +267,28 @@ class _RegisterPageState extends State<RegisterPage> {
       setState(() => _isLoading = true);
       try {
         UserCredential userCredential =
-            await _auth.createUserWithEmailAndPassword(
-          email: emailController.text,
-          password: passwordController.text,
+        await _auth.createUserWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
         );
 
         await _firestore.collection('users').doc(userCredential.user!.uid).set({
-          'firstName': firstNameController.text,
-          'lastName': lastNameController.text,
-          'name with initial': nameInitialController.text,
-          'email': emailController.text,
+          'firstName': firstNameController.text.trim(),
+          'lastName': lastNameController.text.trim(),
+          'nameWithInitial': nameInitialController.text.trim(),
+          'email': emailController.text.trim(),
           'role': selectedRole,
           'stream': selectedRole == 'Student' ? selectedStream : null,
           'childName':
-              selectedRole == 'Parent' ? childNameController.text : null,
+          selectedRole == 'Parent' ? childNameController.text.trim() : null,
           'subject': selectedRole == 'Teacher' ? selectedSubject : null,
         });
 
         Navigator.pushReplacementNamed(context, '/login');
       } catch (e) {
-        print("Registration failed: $e");
-        // Optionally show a snackbar or alert to inform the user
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Registration failed: ${e.toString()}')),
+        );
       } finally {
         setState(() => _isLoading = false);
       }
@@ -236,215 +307,3 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 }
-
-
-
-/*import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-class RegisterPage extends StatefulWidget {
-  @override
-  _RegisterPageState createState() => _RegisterPageState();
-}
-
-class _RegisterPageState extends State<RegisterPage> {
-  final _formKey = GlobalKey<FormState>();
-
-  final firstNameController = TextEditingController();
-  final lastNameController = TextEditingController();
-  final Name_initialController = TextEditingController();
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  final confirmPasswordController = TextEditingController();
-  final childNameController = TextEditingController();
-  final subjectController =
-      TextEditingController(); // Keep the controller for potential use
-
-  String? selectedRole;
-  String? selectedStream;
-  String? selectedSubject; // New variable for selected subject
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          title: Text("Login"),
-          centerTitle: true,
-          backgroundColor: const Color.fromARGB(
-              255, 5, 158, 229), // Set the background color
-          elevation: 0, // Remove shadow for a flat design
-          titleTextStyle: TextStyle(
-            fontSize: 22, // Increase title size
-            fontWeight: FontWeight.bold,
-            color: Colors.white, // Change text color
-          )),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                controller: firstNameController,
-                decoration: InputDecoration(labelText: 'First Name'),
-                validator: (value) => value == null || value.isEmpty
-                    ? 'Please enter your first name'
-                    : null,
-              ),
-              TextFormField(
-                controller: lastNameController,
-                decoration: InputDecoration(labelText: 'Last Name'),
-                validator: (value) => value == null || value.isEmpty
-                    ? 'Please enter your last name'
-                    : null,
-              ),
-              TextFormField(
-                controller: Name_initialController,
-                decoration: InputDecoration(labelText: 'Name with Initial'),
-                validator: (value) => value == null || value.isEmpty
-                    ? 'Please enter your username'
-                    : null,
-              ),
-              TextFormField(
-                controller: emailController,
-                decoration: InputDecoration(labelText: 'Email'),
-                validator: (value) =>
-                    value == null || value.isEmpty || !value.contains('@')
-                        ? 'Please enter a valid email'
-                        : null,
-              ),
-              TextFormField(
-                controller: passwordController,
-                decoration: InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                validator: (value) =>
-                    value == null || value.isEmpty || value.length < 6
-                        ? 'Password must be at least 6 characters'
-                        : null,
-              ),
-              TextFormField(
-                controller: confirmPasswordController,
-                decoration: InputDecoration(labelText: 'Confirm Password'),
-                obscureText: true,
-                validator: (value) => value != passwordController.text
-                    ? 'Passwords do not match'
-                    : null,
-              ),
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(labelText: 'Role'),
-                value: selectedRole,
-                items: ['Student', 'Teacher', 'Parent', 'Principal']
-                    .map((role) =>
-                        DropdownMenuItem(value: role, child: Text(role)))
-                    .toList(),
-                onChanged: (value) => setState(() {
-                  selectedRole = value;
-                  selectedSubject = null; // Reset subject when role changes
-                }),
-                validator: (value) =>
-                    value == null ? 'Please select a role' : null,
-              ),
-              if (selectedRole == 'Student')
-                DropdownButtonFormField<String>(
-                  decoration: InputDecoration(labelText: 'Stream'),
-                  value: selectedStream,
-                  items: ['Physical Science', 'Biological Science']
-                      .map((stream) =>
-                          DropdownMenuItem(value: stream, child: Text(stream)))
-                      .toList(),
-                  onChanged: (value) => setState(() => selectedStream = value),
-                  validator: (value) =>
-                      value == null && selectedRole == 'Student'
-                          ? 'Please select a stream'
-                          : null,
-                ),
-              if (selectedRole == 'Parent')
-                TextFormField(
-                  controller: childNameController,
-                  decoration:
-                      InputDecoration(labelText: 'Child/Children\'s Name(s)'),
-                  validator: (value) => value == null || value.isEmpty
-                      ? 'Please enter your child\'s or children\'s name(s)'
-                      : null,
-                ),
-              if (selectedRole == 'Teacher')
-                DropdownButtonFormField<String>(
-                  decoration: InputDecoration(labelText: 'Subject'),
-                  value: selectedSubject,
-                  items: [
-                    'Biology',
-                    'Physics',
-                    'Chemistry',
-                    'Combined Mathematics'
-                  ]
-                      .map((subject) => DropdownMenuItem(
-                          value: subject, child: Text(subject)))
-                      .toList(),
-                  onChanged: (value) => setState(() => selectedSubject = value),
-                  validator: (value) =>
-                      value == null ? 'Please select a subject' : null,
-                ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    try {
-                      // Create user in Firebase Authentication
-                      UserCredential userCredential =
-                          await _auth.createUserWithEmailAndPassword(
-                        email: emailController.text,
-                        password: passwordController.text,
-                      );
-
-                      // Save additional user information in Firestore
-                      await _firestore
-                          .collection('users')
-                          .doc(userCredential.user!.uid)
-                          .set({
-                        'firstName': firstNameController.text,
-                        'lastName': lastNameController.text,
-                        'name with initial': Name_initialController.text,
-                        'email': emailController.text,
-                        'role': selectedRole,
-                        'stream':
-                            selectedRole == 'Student' ? selectedStream : null,
-                        'childName': selectedRole == 'Parent'
-                            ? childNameController.text
-                            : null,
-                        'subject':
-                            selectedRole == 'Teacher' ? selectedSubject : null,
-                      });
-
-                      print(
-                          "Registration successful and data saved in Firestore!");
-                      Navigator.pushReplacementNamed(context, '/login');
-                    } catch (e) {
-                      print("Registration failed: $e");
-                    }
-                  }
-                },
-                child: Text('Register'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    firstNameController.dispose();
-    lastNameController.dispose();
-    Name_initialController.dispose();
-    emailController.dispose();
-    passwordController.dispose();
-    confirmPasswordController.dispose();
-    childNameController.dispose();
-    subjectController.dispose(); // Dispose of the subject controller as well
-    super.dispose();
-  }
-}*/
