@@ -4,7 +4,7 @@ import 'package:s20/Screens/AnnouncementList.dart';
 //import 'package:s20/Screens/Exam.dart';
 import 'package:s20/Screens/MarkedAttendance.dart';
 import 'package:s20/Screens/ParentMarks.dart';
-import 'package:s20/Screens/Register.dart';
+import 'package:s20/Screens/Registerold.dart';
 import 'package:s20/Screens/SplashScreen.dart';
 import 'package:s20/Screens/TAttendance.dart';
 import 'package:s20/Screens/login.dart';

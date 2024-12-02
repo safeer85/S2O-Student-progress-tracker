@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:s20/Classes/User.dart'; // Import your User class
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -56,85 +55,83 @@ class _RegisterPageState extends State<RegisterPage> {
           child: _isLoading
               ? Center(child: CircularProgressIndicator())
               : Form(
-                  key: _formKey,
-                  child: ListView(
-                    children: [
-                      ZoomIn(child: _buildTitle()),
-                      FadeInUp(
-                        delay: Duration(milliseconds: 200),
-                        child: _buildCard(
-                            'First Name', firstNameController, Icons.person),
-                      ),
-                      FadeInUp(
-                        delay: Duration(milliseconds: 300),
-                        child: _buildCard(
-                            'Last Name', lastNameController, Icons.person),
-                      ),
-                      FadeInUp(
-                        delay: Duration(milliseconds: 400),
-                        child: _buildCard('Name with Initial',
-                            nameInitialController, Icons.person_outline),
-                      ),
-                      FadeInUp(
-                        delay: Duration(milliseconds: 500),
-                        child:
-                            _buildCard('Email', emailController, Icons.email),
-                      ),
-                      FadeInUp(
-                        delay: Duration(milliseconds: 600),
-                        child: _buildCard(
-                            'Password', passwordController, Icons.lock,
-                            obscureText: true),
-                      ),
-                      FadeInUp(
-                        delay: Duration(milliseconds: 700),
-                        child: _buildCard('Confirm Password',
-                            confirmPasswordController, Icons.lock,
-                            obscureText: true),
-                      ),
-                      FadeInUp(
-                        delay: Duration(milliseconds: 800),
-                        child: _buildRoleDropdown(),
-                      ),
-                      if (selectedRole == 'Student')
-                        FadeInUp(
-                          delay: Duration(milliseconds: 900),
-                          child: _buildStreamDropdown(),
-                        ),
-                      if (selectedRole == 'Parent')
-                        FadeInUp(
-                          delay: Duration(milliseconds: 1000),
-                          child: _buildChildNameField(),
-                        ),
-                      if (selectedRole == 'Teacher')
-                        FadeInUp(
-                          delay: Duration(milliseconds: 1100),
-                          child: _buildSubjectDropdown(),
-                        ),
-                      SizedBox(height: 20),
-                      Bounce(
-                        delay: Duration(milliseconds: 1200),
-                        child: ElevatedButton(
-                          onPressed: _register,
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                            elevation: 5,
-                            backgroundColor: Color(0xFF5B86E5),
-                          ),
-                          child: Text(
-                            'Register',
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
+            key: _formKey,
+            child: ListView(
+              children: [
+                ZoomIn(
+                  child: _buildTitle(),
                 ),
+                FadeInUp(
+                  delay: Duration(milliseconds: 200),
+                  child: _buildCard(
+                      'First Name', firstNameController, Icons.person),
+                ),
+                FadeInUp(
+                  delay: Duration(milliseconds: 300),
+                  child: _buildCard(
+                      'Last Name', lastNameController, Icons.person),
+                ),
+                FadeInUp(
+                  delay: Duration(milliseconds: 400),
+                  child: _buildCard('Name with Initial',
+                      nameInitialController, Icons.person_outline),
+                ),
+                FadeInUp(
+                  delay: Duration(milliseconds: 500),
+                  child:
+                  _buildCard('Email', emailController, Icons.email),
+                ),
+                FadeInUp(
+                  delay: Duration(milliseconds: 600),
+                  child: _buildCard('Password', passwordController,
+                      Icons.lock,
+                      obscureText: true),
+                ),
+                FadeInUp(
+                  delay: Duration(milliseconds: 700),
+                  child: _buildCard('Confirm Password',
+                      confirmPasswordController, Icons.lock,
+                      obscureText: true),
+                ),
+                FadeInUp(
+                  delay: Duration(milliseconds: 800),
+                  child: _buildRoleDropdown(),
+                ),
+                if (selectedRole == 'Student')
+                  FadeInUp(
+                    delay: Duration(milliseconds: 900),
+                    child: _buildStreamDropdown(),
+                  ),
+                if (selectedRole == 'Parent')
+                  FadeInUp(
+                    delay: Duration(milliseconds: 1000),
+                    child: _buildChildNameField(),
+                  ),
+                if (selectedRole == 'Teacher')
+                  FadeInUp(
+                    delay: Duration(milliseconds: 1100),
+                    child: _buildSubjectDropdown(),
+                  ),
+                SizedBox(height: 20),
+                Bounce(
+                  delay: Duration(milliseconds: 1200),
+                  child: ElevatedButton(
+                    onPressed: _register,
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      elevation: 5,
+                      backgroundColor: Color(0xFF5B86E5),
+                    ),
+                    child: Text(
+                      'Register',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -155,9 +152,8 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildCard(
-      String label, TextEditingController controller, IconData icon,
-      {bool obscureText = false}) {
+  Widget _buildCard(String label, TextEditingController controller,
+      IconData icon, {bool obscureText = false}) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
       elevation: 2,
@@ -176,9 +172,8 @@ class _RegisterPageState extends State<RegisterPage> {
             filled: true,
             fillColor: Colors.white,
           ),
-          validator: (value) => value == null || value.isEmpty
-              ? 'Please enter your $label'
-              : null,
+          validator: (value) =>
+          value == null || value.isEmpty ? 'Please enter your $label' : null,
         ),
       ),
     );
@@ -190,7 +185,7 @@ class _RegisterPageState extends State<RegisterPage> {
       Icons.people,
       selectedRole,
       ['Student', 'Teacher', 'Parent', 'Principal'],
-      (value) {
+          (value) {
         setState(() {
           selectedRole = value;
           selectedStream = null;
@@ -205,7 +200,7 @@ class _RegisterPageState extends State<RegisterPage> {
       Icons.school,
       selectedStream,
       ['Physical Science', 'Biological Science'],
-      (value) => setState(() => selectedStream = value),
+          (value) => setState(() => selectedStream = value),
     );
   }
 
@@ -215,7 +210,7 @@ class _RegisterPageState extends State<RegisterPage> {
       Icons.book,
       selectedSubject,
       ['Biology', 'Physics', 'Chemistry', 'Combined Mathematics'],
-      (value) => setState(() => selectedSubject = value),
+          (value) => setState(() => selectedSubject = value),
     );
   }
 
@@ -251,35 +246,43 @@ class _RegisterPageState extends State<RegisterPage> {
         'Child/Children\'s Name(s)', childNameController, Icons.child_care);
   }
 
+  Widget _buildSubmitButton() {
+    return ElevatedButton(
+      onPressed: _register,
+      style: ElevatedButton.styleFrom(
+        padding: EdgeInsets.symmetric(vertical: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        elevation: 5,
+        backgroundColor: Color(0xFF5B86E5),
+      ),
+      child: Text(
+        'Register',
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+      ),
+    );
+  }
+
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
       try {
-        // Create a User object from the form data
-        Customuser user = Customuser(
-          firstName: firstNameController.text.trim(),
-          lastName: lastNameController.text.trim(),
-          nameWithInitial: nameInitialController.text.trim(),
-          email: emailController.text.trim(),
-          role: selectedRole,
-          stream: selectedRole == 'Student' ? selectedStream : null,
-          childName:
-              selectedRole == 'Parent' ? childNameController.text.trim() : null,
-          subject: selectedRole == 'Teacher' ? selectedSubject : null,
-        );
-
-        // Register the user using Firebase Authentication
         UserCredential userCredential =
-            await _auth.createUserWithEmailAndPassword(
+        await _auth.createUserWithEmailAndPassword(
           email: emailController.text.trim(),
           password: passwordController.text.trim(),
         );
 
-        // Store the User object data in Firestore
-        await _firestore
-            .collection('users')
-            .doc(userCredential.user!.uid)
-            .set(user.toFirestore());
+        await _firestore.collection('users').doc(userCredential.user!.uid).set({
+          'firstName': firstNameController.text.trim(),
+          'lastName': lastNameController.text.trim(),
+          'nameWithInitial': nameInitialController.text.trim(),
+          'email': emailController.text.trim(),
+          'role': selectedRole,
+          'stream': selectedRole == 'Student' ? selectedStream : null,
+          'childName':
+          selectedRole == 'Parent' ? childNameController.text.trim() : null,
+          'subject': selectedRole == 'Teacher' ? selectedSubject : null,
+        });
 
         Navigator.pushReplacementNamed(context, '/login');
       } catch (e) {
@@ -290,5 +293,17 @@ class _RegisterPageState extends State<RegisterPage> {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  @override
+  void dispose() {
+    firstNameController.dispose();
+    lastNameController.dispose();
+    nameInitialController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    childNameController.dispose();
+    super.dispose();
   }
 }
