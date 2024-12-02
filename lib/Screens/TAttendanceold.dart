@@ -2,9 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-import 'package:s20/Classes/User.dart'; // Import your Customuser class
-import 'package:s20/Classes/Attendance.dart';
-import 'package:s20/main.dart'; // Import your Attendance class
 
 class AttendancePage extends StatefulWidget {
   @override
@@ -17,7 +14,7 @@ class _AttendancePageState extends State<AttendancePage> {
   TimeOfDay? startTime;
   TimeOfDay? endTime;
   Map<String, bool> attendanceStatus = {};
-  List<Customuser> students = []; // List to store students
+  List<Map<String, dynamic>> students = [];
   String teacherName = "Unknown"; // Placeholder for the teacher's name
   bool isLoading = true;
   bool isWithinTimeWindow = true;
@@ -30,7 +27,6 @@ class _AttendancePageState extends State<AttendancePage> {
     _fetchStudents();
   }
 
-  // Fetch the teacher's name from Firestore
   Future<void> _fetchTeacherName() async {
     try {
       String? currentUserUid = FirebaseAuth.instance.currentUser?.uid;
@@ -45,7 +41,6 @@ class _AttendancePageState extends State<AttendancePage> {
     }
   }
 
-  // Fetch the list of students from Firestore
   Future<void> _fetchStudents() async {
     try {
       QuerySnapshot snapshot = await _firestore
@@ -55,13 +50,15 @@ class _AttendancePageState extends State<AttendancePage> {
 
       setState(() {
         students = snapshot.docs.map((doc) {
-          return Customuser.fromFirestore(
-              doc.data() as Map<String, dynamic>, doc.id);
+          return {
+            'id': doc.id,
+            'name': doc['lastname'] ?? 'Unknown',
+          };
         }).toList();
 
         // Initialize attendance status for each student
         for (var student in students) {
-          attendanceStatus[student.id!] = false;
+          attendanceStatus[student['id']!] = false;
         }
         isLoading = false;
       });
@@ -73,7 +70,6 @@ class _AttendancePageState extends State<AttendancePage> {
     }
   }
 
-  // Date picker to select the date
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -89,7 +85,6 @@ class _AttendancePageState extends State<AttendancePage> {
     }
   }
 
-  // Time picker for start time
   Future<void> _selectStartTime(BuildContext context) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
@@ -103,7 +98,6 @@ class _AttendancePageState extends State<AttendancePage> {
     }
   }
 
-  // Time picker for end time
   Future<void> _selectEndTime(BuildContext context) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
@@ -116,7 +110,6 @@ class _AttendancePageState extends State<AttendancePage> {
     }
   }
 
-  // Load existing attendance session
   Future<void> _loadExistingAttendance() async {
     if (selectedDate == null || startTime == null) return;
 
@@ -147,7 +140,6 @@ class _AttendancePageState extends State<AttendancePage> {
     }
   }
 
-  // Save the attendance session
   Future<void> _saveAttendance() async {
     if (selectedDate == null || startTime == null || endTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -177,49 +169,13 @@ class _AttendancePageState extends State<AttendancePage> {
         "${selectedDate!.toIso8601String()}_${startTime!.format(context)}_${teacherName}";
 
     try {
-      // Save attendance data
-      Attendance attendance = Attendance(
-        teacherName: teacherName,
-        date: DateFormat('yyyy-MM-dd').format(selectedDate!),
-        startTime: startTime!.format(context),
-        endTime: endTime!.format(context),
-        attendanceStatus: attendanceStatus,
-      );
-
-      await _firestore
-          .collection('attendance_sessions')
-          .doc(sessionId)
-          .set(attendance.toFirestore());
-
-      // Send notifications for absent students
-      for (String studentId in attendanceStatus.keys) {
-        if (!attendanceStatus[studentId]!) {
-          // If student is absent
-          // Fetch the student name based on studentId
-          final studentSnapshot =
-              await _firestore.collection('users').doc(studentId).get();
-
-          final studentName = studentSnapshot[
-              'name with initial']; // Assuming `firstName` is the student's name
-
-          // Query the user collection to find the parent whose `childName` matches the absent student's name
-          final parentQuerySnapshot = await _firestore
-              .collection('users')
-              .where('childName', isEqualTo: studentName)
-              .where('role',
-                  isEqualTo: 'Parent') // Ensure only parents are matched
-              .get();
-
-          if (parentQuerySnapshot.docs.isNotEmpty) {
-            final parentDoc = parentQuerySnapshot.docs.first;
-            final parentId = parentDoc.id;
-            final parentName = parentDoc['name with initial'];
-
-            // Send notification to the parent
-            await sendLocalNotification(studentName, parentName);
-          }
-        }
-      }
+      await _firestore.collection('attendance_sessions').doc(sessionId).set({
+        'teacherName': teacherName,
+        'date': DateFormat('yyyy-MM-dd').format(selectedDate!),
+        'startTime': startTime!.format(context),
+        'endTime': endTime!.format(context),
+        'attendanceStatus': attendanceStatus,
+      });
 
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Attendance saved successfully")));
@@ -268,14 +224,13 @@ class _AttendancePageState extends State<AttendancePage> {
                       itemBuilder: (context, index) {
                         final student = students[index];
                         return ListTile(
-                          title: Text(student.nameWithInitial ??
-                              'Unknown ${student.lastName}'),
+                          title: Text(student['name']!),
                           trailing: Checkbox(
-                            value: attendanceStatus[student.id],
+                            value: attendanceStatus[student['id']],
                             onChanged: isWithinTimeWindow
                                 ? (bool? value) {
                                     setState(() {
-                                      attendanceStatus[student.id!] = value!;
+                                      attendanceStatus[student['id']] = value!;
                                     });
                                   }
                                 : null,

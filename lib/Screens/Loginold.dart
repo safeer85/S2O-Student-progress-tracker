@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:s20/Screens/Home.dart';
+import 'package:s20/Screens/Homeold.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -36,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
 
         if (userDoc.exists) {
           Map<String, dynamic> userData =
-          userDoc.data() as Map<String, dynamic>;
+              userDoc.data() as Map<String, dynamic>;
           String role = userData['role'] ?? 'user';
 
           Navigator.pushReplacement(
@@ -153,12 +153,12 @@ class _LoginPageState extends State<LoginPage> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12.0),
                             borderSide:
-                            BorderSide(color: Colors.white, width: 2),
+                                BorderSide(color: Colors.white, width: 2),
                           ),
                         ),
                         validator: (value) => value == null ||
-                            value.isEmpty ||
-                            !value.contains('@')
+                                value.isEmpty ||
+                                !value.contains('@')
                             ? 'Please enter a valid email'
                             : null,
                       ),
@@ -180,7 +180,7 @@ class _LoginPageState extends State<LoginPage> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12.0),
                             borderSide:
-                            BorderSide(color: Colors.white, width: 2),
+                                BorderSide(color: Colors.white, width: 2),
                           ),
                         ),
                         obscureText: true,
@@ -194,27 +194,27 @@ class _LoginPageState extends State<LoginPage> {
                       duration: Duration(milliseconds: 900),
                       child: isLoading
                           ? Center(
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                        ),
-                      )
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            )
                           : ElevatedButton(
-                        onPressed: loginUser,
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 100, vertical: 15),
-                          backgroundColor: Colors.blue[700],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          elevation: 5,
-                        ),
-                        child: Text(
-                          'Login',
-                          style: TextStyle(
-                              fontSize: 18, color: Colors.white),
-                        ),
-                      ),
+                              onPressed: loginUser,
+                              style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 100, vertical: 15),
+                                backgroundColor: Colors.blue[700],
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                                elevation: 5,
+                              ),
+                              child: Text(
+                                'Login',
+                                style: TextStyle(
+                                    fontSize: 18, color: Colors.white),
+                              ),
+                            ),
                     ),
                     SizedBox(height: 20),
                     FadeInUp(

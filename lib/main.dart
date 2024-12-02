@@ -8,15 +8,26 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+Future<void> initializeNotifications() async {
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher'); // App icon
+
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+}
+/*Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   _showLocalNotification(message);
-}
+}*/
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  await initializeNotifications();
+  // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   /*FirebaseMessaging messaging = FirebaseMessaging.instance;
   NotificationSettings settings = await messaging.requestPermission(
     alert: true,
@@ -46,7 +57,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-void _showLocalNotification(RemoteMessage message) async {
+/*void _showLocalNotification(RemoteMessage message) async {
   AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
     'announcements_channel',
     'Announcements',
@@ -63,5 +74,27 @@ void _showLocalNotification(RemoteMessage message) async {
     message.notification?.title,
     message.notification?.body,
     notificationDetails,
+  );
+}*/
+Future<void> sendLocalNotification(
+    String studentName, String parentName) async {
+  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+      AndroidNotificationDetails(
+    'attendance_channel', // Channel ID
+    'Attendance Notifications', // Channel Name
+    channelDescription: 'Notifications for attendance updates',
+    importance: Importance.high,
+    priority: Priority.high,
+    ticker: 'ticker',
+  );
+
+  const NotificationDetails platformChannelSpecifics =
+      NotificationDetails(android: androidPlatformChannelSpecifics);
+
+  await flutterLocalNotificationsPlugin.show(
+    0, // Notification ID
+    'Attendance Alert',
+    'Dear $parentName, your child $studentName was absent today.',
+    platformChannelSpecifics,
   );
 }

@@ -8,8 +8,10 @@ import 'package:s20/Screens/Registerold.dart';
 import 'package:s20/Screens/SplashScreen.dart';
 import 'package:s20/Screens/TAttendance.dart';
 import 'package:s20/Screens/login.dart';
+import 'package:s20/Screens/parentAttendance.dart';
 import 'package:s20/Screens/viewAnnouncement.dart';
 import 'package:s20/Screens/viewAttendance.dart';
+import 'package:s20/Screens/viewMarks.dart';
 
 class AppRoutes {
   static const String splash = '/splash';
@@ -24,6 +26,9 @@ class AppRoutes {
   static const String viewAttendance = '/viewAttendance';
   static const String viewAnnouncement = '/viewAnnouncement';
   static const String viewchildmarks = '/viewchildmarks';
+  static const String viewChildAttendance = '/viewChildAttendance';
+  static const String viewChildMarks = '/viewChildMarks';
+  static const String viewMarks = '/viewMarks';
 
   static Map<String, WidgetBuilder> routes = {
     splash: (context) => const SplashScreen(),
@@ -36,7 +41,23 @@ class AppRoutes {
     announcementlist: (context) => AnnouncementsListPage(),
     viewAttendance: (context) => ViewAttendancePage(),
     viewAnnouncement: (context) => ViewAnnouncementPage(),
-    viewchildmarks: (context) => ViewMarksPage()
+    //viewchildmarks: (context) => ViewMarksPage(),
+    viewChildAttendance:
+        (context) //=> AttendanceDetailPage(childName: childName)
+        {
+      final String childName =
+          ModalRoute.of(context)!.settings.arguments as String;
+      return AttendanceDetailPage(
+          childName: childName); // Pass childName to AttendanceDetailPage
+    },
+    viewChildMarks: (context) //=> AttendanceDetailPage(childName: childName)
+        {
+      final String childName =
+          ModalRoute.of(context)!.settings.arguments as String;
+      return ViewChildMarksPage(
+          childName: childName); // Pass childName to AttendanceDetailPage
+    },
+    viewMarks: (context) => StudentMarksPage(),
     // examMarks: (context) => ExamMarksEntryPage(teacherName: 'YourTeacherName')
   };
 }

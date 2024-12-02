@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:s20/Classes/User.dart'; // Make sure this import is correct
 import 'package:s20/Routes/routes.dart';
 import 'package:s20/components/Drawer.dart';
 
 class HomePage extends StatefulWidget {
-  final String role;
+  final Customuser user; // Pass Customuser object
 
-  const HomePage({Key? key, required this.role}) : super(key: key);
+  const HomePage({Key? key, required this.user}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -23,128 +22,161 @@ class _HomePageState extends State<HomePage> {
       _buildResponsivePageContent(
         title: "Attendance",
         subtitle: "Manage attendance efficiently",
-        roleSpecificActions: widget.role == 'Teacher'
+        roleSpecificActions: widget.user.role == 'Teacher'
             ? [
-          _buildFeatureCard(
-            title: "Take Attendance",
-            description: "Record attendance for your class",
-            icon: Icons.check_circle,
-            onPressed: () {
-              Navigator.pushNamed(context, '/takeAttendance');
-            },
-          ),
-          _buildFeatureCard(
-            title: "See Recorded Attendance",
-            description: "View attendance records",
-            icon: Icons.list_alt,
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.markedAttendance);
-            },
-          ),
-        ]
-            : [
-          _buildFeatureCard(
-            title: "View Attendance",
-            description: "See your attendance records",
-            icon: Icons.visibility,
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.viewAttendance);
-            },
-          ),
-        ],
+                _buildFeatureCard(
+                  title: "Take Attendance",
+                  description: "Record attendance for your class",
+                  icon: Icons.check_circle,
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/takeAttendance');
+                  },
+                ),
+                _buildFeatureCard(
+                  title: "See Recorded Attendance",
+                  description: "View attendance records",
+                  icon: Icons.list_alt,
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.markedAttendance);
+                  },
+                ),
+              ]
+            : widget.user.role == 'Parent'
+                ? [
+                    _buildFeatureCard(
+                      title: "View Child's Attendance",
+                      description: "See your child's attendance records",
+                      icon: Icons.visibility,
+                      onPressed: () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes
+                              .viewChildAttendance, // Navigate to child's attendance page
+                          arguments:
+                              widget.user.childName, // Pass the child's name
+                        );
+                      },
+                    ),
+                  ]
+                : [
+                    _buildFeatureCard(
+                      title: "View Attendance",
+                      description: "See your attendance records",
+                      icon: Icons.visibility,
+                      onPressed: () {
+                        Navigator.pushNamed(context, AppRoutes.viewAttendance);
+                      },
+                    ),
+                  ],
       ),
       _buildResponsivePageContent(
         title: "Announcements",
         subtitle: "Stay updated with the latest news",
-        roleSpecificActions: widget.role == 'Teacher'
+        roleSpecificActions: widget.user.role == 'Teacher'
             ? [
-          _buildFeatureCard(
-            title: "Post Announcement",
-            description: "Share important updates",
-            icon: Icons.announcement,
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.announcement);
-            },
-          ),
-          _buildFeatureCard(
-            title: "View Announcements",
-            description: "Browse past announcements",
-            icon: Icons.list,
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.announcementlist);
-            },
-          ),
-        ]
+                _buildFeatureCard(
+                  title: "Post Announcement",
+                  description: "Share important updates",
+                  icon: Icons.notification_important,
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.announcement);
+                  },
+                ),
+              ]
             : [
-          _buildFeatureCard(
-            title: "View Announcements",
-            description: "Check updates and notices",
-            icon: Icons.announcement,
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.viewAnnouncement);
-            },
-          ),
-        ],
+                _buildFeatureCard(
+                  title: "View Announcements",
+                  description: "Read the latest updates",
+                  icon: Icons.notifications,
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.viewAnnouncement);
+                  },
+                ),
+              ],
       ),
       _buildResponsivePageContent(
         title: "Exams",
-        subtitle: "Manage and track exam performance",
-        roleSpecificActions: widget.role == 'Teacher'
+        subtitle: "Manage exams and results",
+        roleSpecificActions: widget.user.role == 'Teacher'
             ? [
-          _buildFeatureCard(
-            title: "Enter Exam Marks",
-            description: "Record student marks",
-            icon: Icons.task,
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.examMarks);
-            },
-          ),
-        ]
-            : widget.role == 'Parent'
-            ? [
-          _buildFeatureCard(
-            title: "View Marks",
-            description: "Check your child's performance",
-            icon: Icons.task,
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.viewchildmarks);
-            },
-          ),
-        ]
-            : [],
+                _buildFeatureCard(
+                  title: "Enter Marks",
+                  description: "Input term exam marks",
+                  icon: Icons.edit,
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.examMarks);
+                  },
+                ),
+                _buildFeatureCard(
+                  title: "View Student Marks",
+                  description: "you can see the students marks",
+                  icon: Icons.edit,
+                  onPressed: () {
+                    //Navigator.pushNamed(context, AppRoutes.examMarks);
+                  },
+                ),
+              ]
+            : widget.user.role == 'Parent'
+                ? [
+                    _buildFeatureCard(
+                      title: "View Child's Marks",
+                      description: "See your child's Marks here",
+                      icon: Icons.visibility,
+                      onPressed: () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes
+                              .viewChildMarks, // Navigate to child's attendance page
+                          arguments:
+                              widget.user.childName, // Pass the child's name
+                        );
+                      },
+                    ),
+                  ]
+                : widget.user.role == 'Student'
+                    ? [
+                        _buildFeatureCard(
+                          title: "View Your Marks",
+                          description: "See your child's Marks here",
+                          icon: Icons.visibility,
+                          onPressed: () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes
+                                  .viewMarks, // Navigate to child's attendance page
+                              // Pass the child's name
+                            );
+                          },
+                        ),
+                      ]
+                    : [],
       ),
     ];
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text("Home Page"),
+        title: Text("Hello ${widget.user.nameWithInitial}"),
         centerTitle: true,
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFF36D1DC), Color(0xFF5B86E5)],
+              colors: [Color(0xFF7F00FF), Color(0xFFE100FF)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
           ),
         ),
-        elevation: 5,
-        backgroundColor: Colors.transparent,
       ),
       drawer: const CustomDrawer(),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF36D1DC), Color(0xFF5B86E5)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: _pages[_selectedIndex],
-      ),
+      body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        items: const [
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.assignment),
             label: 'Attendance',
@@ -154,20 +186,10 @@ class _HomePageState extends State<HomePage> {
             label: 'Announcements',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.task_rounded),
+            icon: Icon(Icons.school),
             label: 'Exams',
           ),
         ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white70,
-        backgroundColor: Color(0xFF5B86E5),
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        type: BottomNavigationBarType.fixed,
       ),
     );
   }
@@ -178,44 +200,29 @@ class _HomePageState extends State<HomePage> {
     required List<Widget> roleSpecificActions,
   }) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          FadeInDown(
-            child: Text(
-              title,
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  subtitle,
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+                SizedBox(height: 20),
+                ...roleSpecificActions,
+              ],
             ),
-          ),
-          const SizedBox(height: 10),
-          FadeInDown(
-            delay: Duration(milliseconds: 200),
-            child: Text(
-              subtitle,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white70,
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            itemCount: roleSpecificActions.length,
-            itemBuilder: (context, index) {
-              return roleSpecificActions[index];
-            },
           ),
         ],
       ),
@@ -228,44 +235,30 @@ class _HomePageState extends State<HomePage> {
     required IconData icon,
     required VoidCallback onPressed,
   }) {
-    return BounceInUp(
-      child: Card(
-        elevation: 8,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(15),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Color(0xFF36D1DC),
-                  child: Icon(icon, size: 30, color: Colors.white),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF5B86E5),
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        onTap: onPressed,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Icon(icon, size: 40),
+              SizedBox(width: 16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  description,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black54,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
+                  Text(description),
+                ],
+              ),
+            ],
           ),
         ),
       ),
