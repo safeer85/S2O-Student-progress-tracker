@@ -189,7 +189,7 @@ class _RegisterPageState extends State<RegisterPage> {
       'Role',
       Icons.people,
       selectedRole,
-      ['Student', 'Teacher', 'Parent', 'Principal'],
+      ['Student', 'Teacher', 'Parent'],
       (value) {
         setState(() {
           selectedRole = value;

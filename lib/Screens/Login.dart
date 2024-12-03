@@ -5,6 +5,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:s20/Screens/Home.dart';
 import 'package:s20/Classes/User.dart'; // Make sure this import is correct
 import 'package:s20/Classes/Marks.dart';
+import 'package:s20/Screens/PrincipalDashboard.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -49,8 +50,15 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  HomePage(user: customUser), // Pass Customuser
+              builder: (context) {
+                if (customUser.role == 'Principal') {
+                  // Navigate to the Principal Dashboard if the role is Principal
+                  return PrincipalDashboard(user: customUser);
+                } else {
+                  // Navigate to the Home Page for other roles
+                  return HomePage(user: customUser);
+                }
+              },
             ),
           );
         } else {

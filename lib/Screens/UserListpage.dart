@@ -51,7 +51,16 @@ class _UserListPageState extends State<UserListPage> {
   Stream<List<Customuser>> _getUsers() {
     return _firestore
         .collection('users')
-        .where('role', isNotEqualTo: widget.user.role) // Exclude current user
+        .where(
+          'role',
+          whereIn: widget.user.role == 'Teacher'
+              ? [
+                  'Student',
+                  'Parent',
+                  'Teacher'
+                ] // Teacher can chat with everyone
+              : ['Teacher'], // Students and parents can chat only with teachers
+        )
         .snapshots()
         .map((snapshot) {
       return snapshot.docs
