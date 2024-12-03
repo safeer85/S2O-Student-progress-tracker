@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:s20/Classes/Marks.dart';
+
 import 'package:s20/Classes/User.dart'; // Make sure this import is correct
 import 'package:s20/Routes/routes.dart';
 import 'package:s20/Screens/UserListpage.dart';
@@ -228,7 +228,7 @@ class _HomePageState extends State<HomePage> {
         title: Text("Hello ${widget.user.nameWithInitial}"),
         centerTitle: true,
         flexibleSpace: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [Color(0xFF7F00FF), Color(0xFFE100FF)],
               begin: Alignment.topLeft,
@@ -246,7 +246,7 @@ class _HomePageState extends State<HomePage> {
             _selectedIndex = index;
           });
         },
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.assignment),
             label: 'Attendance',
@@ -264,6 +264,11 @@ class _HomePageState extends State<HomePage> {
             label: 'Chat',
           ),
         ],
+        backgroundColor: Colors.white, // Set background color
+        selectedItemColor: Colors.blue, // Color for the selected item
+        unselectedItemColor: Colors.grey, // Color for unselected items
+        showUnselectedLabels: true, // Display labels for unselected items
+        type: BottomNavigationBarType.fixed, // Prevent shifting effect
       ),
     );
   }
@@ -283,17 +288,17 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                   subtitle,
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  style: const TextStyle(fontSize: 16, color: Colors.grey),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ...roleSpecificActions,
               ],
             ),

@@ -16,6 +16,19 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   TextEditingController _messageController = TextEditingController();
+  String receiverName = 'Loading...';
+  @override
+  void initState() {
+    super.initState();
+    _loadReceiverName();
+  }
+
+  Future<void> _loadReceiverName() async {
+    final name = await _getReceiverName();
+    setState(() {
+      receiverName = name;
+    });
+  }
 
   Future<void> _sendMessage() async {
     if (_messageController.text.isNotEmpty) {
@@ -38,6 +51,32 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  Future<String> _getReceiverName() async {
+    try {
+      final chatDoc =
+          await _firestore.collection('chats').doc(widget.chatId).get();
+
+      if (chatDoc.exists) {
+        final data = chatDoc.data();
+        final user1Id = data?['user1'];
+        final user2Id = data?['user2'];
+
+        // Determine the receiver based on the sender
+        final receiverId = (user1Id == widget.user.id) ? user2Id : user1Id;
+
+        if (receiverId != null) {
+          final userDoc =
+              await _firestore.collection('users').doc(receiverId).get();
+          return userDoc.data()?['name with initial'] ?? 'Unknown User';
+        }
+      }
+      return 'Unknown User';
+    } catch (e) {
+      print('Error fetching receiver name: $e');
+      return 'Unknown User';
+    }
+  }
+
   Stream<List<Message>> _getMessages() {
     return _firestore
         .collection('chats')
@@ -56,7 +95,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat with ${widget.chatId}'),
+        title: Text('Chat with $receiverName'),
       ),
       body: Column(
         children: [
