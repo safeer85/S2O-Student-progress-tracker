@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'ChatPage.dart'; // Import the ChatPage to navigate to the chat
-import 'package:s20/Classes/User.dart'; // Your Customuser model
+import 'package:s20/Classes/User.dart';
+import 'package:s20/Services/Chatservice.dart'; // Your Customuser model
 
 class UserListPage extends StatefulWidget {
   final Customuser user;
@@ -16,43 +17,34 @@ class _UserListPageState extends State<UserListPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> _createOrNavigateToChat(Customuser otherUser) async {
-    // Check if chat room already exists
-    final chatQuery = await FirebaseFirestore.instance
-        .collection('chats')
-        .where('user1', isEqualTo: widget.user.id)
-        .where('user2', isEqualTo: otherUser.id)
-        .get();
+    final chatId = ChatUtils.generateChatId(widget.user.id, otherUser.id);
 
-    if (chatQuery.docs.isEmpty) {
-      // Create new chat room if not exists
+    // Check if chat already exists
+    final chatQuery =
+        await FirebaseFirestore.instance.collection('chats').doc(chatId).get();
+
+    if (!chatQuery.exists) {
+      // Create new chat room if it doesn't exist
       final newChat = {
         'user1': widget.user.id,
         'user2': otherUser.id,
+        'lastMessage': '',
         'timestamp': Timestamp.now(),
       };
 
-      // Add the new chat room
-      final chatDoc =
-          await FirebaseFirestore.instance.collection('chats').add(newChat);
-
-      // Navigate to chat page
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ChatPage(user: widget.user, chatId: chatDoc.id),
-        ),
-      );
-    } else {
-      // Navigate to existing chat room
-      final existingChatId = chatQuery.docs.first.id;
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              ChatPage(user: widget.user, chatId: existingChatId),
-        ),
-      );
+      await FirebaseFirestore.instance
+          .collection('chats')
+          .doc(chatId)
+          .set(newChat);
     }
+
+    // Navigate to the chat page
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChatPage(user: widget.user, chatId: chatId),
+      ),
+    );
   }
 
   // Fetch the list of users (students, teachers, etc.)
