@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:s20/Classes/Marks.dart';
 import 'package:s20/Classes/User.dart'; // Make sure this import is correct
 import 'package:s20/Routes/routes.dart';
+import 'package:s20/Screens/UserListpage.dart';
 import 'package:s20/components/Drawer.dart';
+import 'package:s20/Screens/Exam.dart';
+import 'package:s20/Screens/teacherViewMarks.dart';
 
 class HomePage extends StatefulWidget {
-  final Customuser user; // Pass Customuser object
+  final Customuser user;
+  // final ExamMarks marks; // Pass Customuser object
 
   const HomePage({Key? key, required this.user}) : super(key: key);
 
@@ -104,7 +109,12 @@ class _HomePageState extends State<HomePage> {
                   description: "Input term exam marks",
                   icon: Icons.edit,
                   onPressed: () {
-                    Navigator.pushNamed(context, AppRoutes.examMarks);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EnterMarksPage(user: widget.user),
+                      ),
+                    );
                   },
                 ),
                 _buildFeatureCard(
@@ -112,7 +122,12 @@ class _HomePageState extends State<HomePage> {
                   description: "you can see the students marks",
                   icon: Icons.edit,
                   onPressed: () {
-                    //Navigator.pushNamed(context, AppRoutes.examMarks);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ViewMarksPage(user: widget.user),
+                      ),
+                    );
                   },
                 ),
               ]
@@ -145,6 +160,61 @@ class _HomePageState extends State<HomePage> {
                               AppRoutes
                                   .viewMarks, // Navigate to child's attendance page
                               // Pass the child's name
+                            );
+                          },
+                        ),
+                      ]
+                    : [],
+      ),
+      _buildResponsivePageContent(
+        title: "chat",
+        subtitle: "Manage exams and results",
+        roleSpecificActions: widget.user.role == 'Teacher'
+            ? [
+                _buildFeatureCard(
+                  title: "Chat",
+                  description: "chat with others",
+                  icon: Icons.edit,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UserListPage(user: widget.user),
+                      ),
+                    );
+                  },
+                ),
+              ]
+            : widget.user.role == 'Parent'
+                ? [
+                    _buildFeatureCard(
+                      title: "chat",
+                      description: "chat with others",
+                      icon: Icons.chat,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                UserListPage(user: widget.user),
+                          ),
+                        );
+                      },
+                    ),
+                  ]
+                : widget.user.role == 'Student'
+                    ? [
+                        _buildFeatureCard(
+                          title: "chat",
+                          description: "chat with others",
+                          icon: Icons.visibility,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    UserListPage(user: widget.user),
+                              ),
                             );
                           },
                         ),
@@ -188,6 +258,10 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.school),
             label: 'Exams',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat),
+            label: 'Chat',
           ),
         ],
       ),

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:s20/Screens/Home.dart';
 import 'package:s20/Classes/User.dart'; // Make sure this import is correct
+import 'package:s20/Classes/Marks.dart';
 
 class LoginPage extends StatefulWidget {
   @override

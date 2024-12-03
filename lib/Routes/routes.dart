@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:s20/Classes/Marks.dart';
 import 'package:s20/Screens/Announcement.dart';
 import 'package:s20/Screens/AnnouncementList.dart';
 //import 'package:s20/Screens/Exam.dart';
@@ -58,6 +59,12 @@ class AppRoutes {
           childName: childName); // Pass childName to AttendanceDetailPage
     },
     viewMarks: (context) => StudentMarksPage(),
+    examMarks: (context) {
+      final String childName =
+          ModalRoute.of(context)!.settings.arguments as String;
+      return ViewChildMarksPage(
+          childName: childName); // Pass childName to AttendanceDetailPage
+    }
     // examMarks: (context) => ExamMarksEntryPage(teacherName: 'YourTeacherName')
   };
 }
