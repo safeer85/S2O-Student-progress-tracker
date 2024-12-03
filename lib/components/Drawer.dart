@@ -73,6 +73,8 @@ class CustomDrawer extends StatelessWidget {
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:s20/Routes/routes.dart';
+import 'package:s20/Screens/setting.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -152,7 +154,13 @@ class CustomDrawer extends StatelessWidget {
               ),
               ListTile(
                 leading: const Icon(Icons.settings),
-                title: const Text('Settings'),
+                title: Text('Settings'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SettingsPage()),
+                  );
+                },
               ),
               ListTile(
                 leading: const Icon(Icons.help),

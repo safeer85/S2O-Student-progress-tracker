@@ -87,6 +87,14 @@ class _HomePageState extends State<HomePage> {
                     Navigator.pushNamed(context, AppRoutes.announcement);
                   },
                 ),
+                _buildFeatureCard(
+                  title: "View posted Announcement List",
+                  description: "manage posted announcments",
+                  icon: Icons.notification_important,
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.announcementlist);
+                  },
+                ),
               ]
             : [
                 _buildFeatureCard(

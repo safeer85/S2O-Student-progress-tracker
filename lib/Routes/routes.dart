@@ -10,6 +10,7 @@ import 'package:s20/Screens/SplashScreen.dart';
 import 'package:s20/Screens/TAttendance.dart';
 import 'package:s20/Screens/login.dart';
 import 'package:s20/Screens/parentAttendance.dart';
+import 'package:s20/Screens/setting.dart';
 import 'package:s20/Screens/viewAnnouncement.dart';
 import 'package:s20/Screens/viewAttendance.dart';
 import 'package:s20/Screens/viewMarks.dart';
@@ -30,6 +31,7 @@ class AppRoutes {
   static const String viewChildAttendance = '/viewChildAttendance';
   static const String viewChildMarks = '/viewChildMarks';
   static const String viewMarks = '/viewMarks';
+  static const String setting = '/setting';
 
   static Map<String, WidgetBuilder> routes = {
     splash: (context) => const SplashScreen(),
@@ -42,6 +44,7 @@ class AppRoutes {
     announcementlist: (context) => AnnouncementsListPage(),
     viewAttendance: (context) => ViewAttendancePage(),
     viewAnnouncement: (context) => ViewAnnouncementPage(),
+    setting: (context) => SettingsPage(),
     //viewchildmarks: (context) => ViewMarksPage(),
     viewChildAttendance:
         (context) //=> AttendanceDetailPage(childName: childName)
