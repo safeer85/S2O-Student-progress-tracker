@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:s20/Classes/User.dart';
+import 'package:s20/Screens/ParentManagePage.dart';
+import 'package:s20/Screens/StudentManage.dart';
 import 'package:s20/components/Drawer.dart';
 import 'ChatPage.dart';
 
@@ -145,8 +147,9 @@ class _PrincipalDashboardState extends State<PrincipalDashboard> {
             SizedBox(height: 20),
 
             // Display the counts of users, teachers, students, and parents
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Wrap(
+              spacing: 16,
+              runSpacing: 16,
               children: [
                 _buildUserCountCard('Total Users', totalUsers),
                 _buildUserCountCard('Teachers', teachersCount),
@@ -163,6 +166,32 @@ class _PrincipalDashboardState extends State<PrincipalDashboard> {
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
                 children: [
+                  _buildFeatureCard(
+                    context,
+                    icon: Icons.school,
+                    title: 'Manage Students',
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            StudentManagePage(), // Navigate to Student Manage Page
+                      ),
+                    ),
+                  ),
+
+                  // Card for managing parents
+                  _buildFeatureCard(
+                    context,
+                    icon: Icons.family_restroom,
+                    title: 'Manage Parents',
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ParentManagePage(), // Navigate to Parent Manage Page
+                      ),
+                    ),
+                  ),
                   _buildFeatureCard(
                     context,
                     icon: Icons.person_add,
