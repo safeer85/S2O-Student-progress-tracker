@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:s20/Classes/User.dart';
+import 'package:s20/Screens/AddTeacherPage.dart';
 import 'package:s20/Screens/ParentManagePage.dart';
 import 'package:s20/Screens/StudentManage.dart';
 import 'package:s20/components/Drawer.dart';
@@ -199,7 +200,7 @@ class _PrincipalDashboardState extends State<PrincipalDashboard> {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => AddTeacherPage(
+                        /*builder: (context) => AddTeacherPage(
                           addTeacherFunction: _addTeacher,
                           emailController: _emailController,
                           firstNameController: _firstNameController,
@@ -207,7 +208,8 @@ class _PrincipalDashboardState extends State<PrincipalDashboard> {
                           passwordController: _passwordController,
                           nameWithInitialController: _nameWithInitialController,
                           subjectController: _subjectController,
-                        ),
+                        )*/
+                        builder: (context) => AddTeacherPage(),
                       ),
                     ),
                   ),
@@ -292,7 +294,7 @@ Widget _buildUserCountCard(String title, int count) {
 }
 
 // Add Teacher Page
-class AddTeacherPage extends StatelessWidget {
+/*class AddTeacherPage extends StatelessWidget {
   final Function addTeacherFunction;
   final TextEditingController emailController;
   final TextEditingController firstNameController;
@@ -426,7 +428,7 @@ class AddTeacherPage extends StatelessWidget {
       ),
     );
   }
-}
+}*/
 
 // Teacher List Page
 class TeacherListPage extends StatelessWidget {

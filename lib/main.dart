@@ -57,25 +57,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-/*void _showLocalNotification(RemoteMessage message) async {
-  AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-    'announcements_channel',
-    'Announcements',
-    importance: Importance.high,
-    priority: Priority.high,
-    showWhen: false,
-  );
-  NotificationDetails notificationDetails = NotificationDetails(
-    android: androidDetails,
-  );
-
-  await flutterLocalNotificationsPlugin.show(
-    message.notification.hashCode,
-    message.notification?.title,
-    message.notification?.body,
-    notificationDetails,
-  );
-}*/
 Future<void> sendLocalNotification(
     String studentName, String parentName) async {
   const AndroidNotificationDetails androidPlatformChannelSpecifics =

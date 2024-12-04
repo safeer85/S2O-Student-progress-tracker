@@ -217,7 +217,7 @@ class _AttendancePageState extends State<AttendancePage> {
                         return Card(
                           margin: const EdgeInsets.symmetric(vertical: 8),
                           child: ListTile(
-                            title: Text(student.firstName ?? "Unknown"),
+                            title: Text(student.nameWithInitial ?? "Unknown"),
                             trailing: Checkbox(
                               value: attendanceStatus[student.id],
                               onChanged: isWithinTimeWindow

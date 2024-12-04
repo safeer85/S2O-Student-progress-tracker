@@ -111,12 +111,6 @@ class StudentManagePage extends StatelessWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigate to Add Student Page
-        },
-        child: Icon(Icons.add),
-      ),
     );
   }
 }
