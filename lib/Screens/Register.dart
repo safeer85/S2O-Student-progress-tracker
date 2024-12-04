@@ -21,7 +21,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   String? selectedRole;
   String? selectedStream;
-  String? selectedSubject;
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   bool _isLoading = false;
@@ -106,11 +106,6 @@ class _RegisterPageState extends State<RegisterPage> {
                           delay: Duration(milliseconds: 1000),
                           child: _buildChildNameField(),
                         ),
-                      if (selectedRole == 'Teacher')
-                        FadeInUp(
-                          delay: Duration(milliseconds: 1100),
-                          child: _buildSubjectDropdown(),
-                        ),
                       SizedBox(height: 20),
                       Bounce(
                         delay: Duration(milliseconds: 1200),
@@ -189,7 +184,7 @@ class _RegisterPageState extends State<RegisterPage> {
       'Role',
       Icons.people,
       selectedRole,
-      ['Student', 'Teacher', 'Parent'],
+      ['Student', 'Parent'],
       (value) {
         setState(() {
           selectedRole = value;
@@ -206,16 +201,6 @@ class _RegisterPageState extends State<RegisterPage> {
       selectedStream,
       ['Physical Science', 'Biological Science'],
       (value) => setState(() => selectedStream = value),
-    );
-  }
-
-  Widget _buildSubjectDropdown() {
-    return _buildDropdown(
-      'Subject',
-      Icons.book,
-      selectedSubject,
-      ['Biology', 'Physics', 'Chemistry', 'Combined Mathematics'],
-      (value) => setState(() => selectedSubject = value),
     );
   }
 
@@ -265,7 +250,6 @@ class _RegisterPageState extends State<RegisterPage> {
           stream: selectedRole == 'Student' ? selectedStream : null,
           childName:
               selectedRole == 'Parent' ? childNameController.text.trim() : null,
-          subject: selectedRole == 'Teacher' ? selectedSubject : null,
         );
 
         // Register the user using Firebase Authentication

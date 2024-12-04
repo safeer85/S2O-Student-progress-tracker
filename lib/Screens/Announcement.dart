@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -88,6 +90,10 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
         'timestamp': FieldValue.serverTimestamp(),
         'targetAudience': targetAudience,
       });
+      // Send notification to selected topics
+      /*for (String audience in targetAudience) {
+        await _sendFCMNotification(audience);
+      }*/
 
       await FirebaseMessaging.instance.subscribeToTopic("announcements");
 
@@ -117,12 +123,46 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
     }
   }
 
+  /*Future<void> _sendFCMNotification(String topic) async {
+    // Use your backend or an HTTP library to send the FCM notification
+    final String serverKey =
+        ''; // Replace with your FCM server key
+    final String fcmEndpoint = 'https://fcm.googleapis.com/fcm/send';
+
+    final Map<String, dynamic> notificationData = {
+      'to': '/topics/$topic',
+      'notification': {
+        'title': _titleController.text,
+        'body': _contentController.text,
+      },
+      'data': {
+        'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+        'type': 'announcement',
+      },
+    };
+
+    final response = await http.post(
+      Uri.parse(fcmEndpoint),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'key=$serverKey',
+      },
+      body: jsonEncode(notificationData),
+    );
+
+    if (response.statusCode == 200) {
+      print("Notification sent to $topic successfully.");
+    } else {
+      print("Error sending notification to $topic: ${response.body}");
+    }
+  }*/
+
   @override
   Widget build(BuildContext context) {
     if (!isTeacher) {
       return Scaffold(
         appBar: AppBar(title: Text("Create Announcement")),
-        body: Center(child: Text("Access restricted to teachers only.")),
+        body: Center(child: Text("Loading...")),
       );
     }
 

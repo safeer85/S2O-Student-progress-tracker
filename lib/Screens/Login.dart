@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -43,9 +44,9 @@ class _LoginPageState extends State<LoginPage> {
             userDoc.data() as Map<String, dynamic>,
             userDoc.id,
           );
-
-          // Using the custom user's role to navigate
           String role = customUser.role ?? 'user';
+
+          //Using the custom user's role to navigate
 
           Navigator.pushReplacement(
             context,
