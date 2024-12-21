@@ -3,6 +3,8 @@ import 'package:animate_do/animate_do.dart';
 
 import 'package:s20/Classes/User.dart'; // Make sure this import is correct
 import 'package:s20/Routes/routes.dart';
+import 'package:s20/Screens/StudentViewDownload.dart';
+import 'package:s20/Screens/TeacherResource.dart';
 import 'package:s20/Screens/UserListpage.dart';
 import 'package:s20/components/Drawer.dart';
 import 'package:s20/Screens/Exam.dart';
@@ -175,6 +177,45 @@ class _HomePageState extends State<HomePage> {
                     : [],
       ),
       _buildResponsivePageContent(
+        title: "Resources",
+        subtitle: "Access and share learning materials",
+        roleSpecificActions: widget.user.role == 'Teacher'
+            ? [
+                _buildFeatureCard(
+                  title: "Share Resources",
+                  description: "Upload and share resources with students",
+                  icon: Icons.upload_file,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            TeacherResourceSharePage(user: widget.user),
+                      ),
+                    );
+                  },
+                ),
+              ]
+            : widget.user.role == 'Student'
+                ? [
+                    _buildFeatureCard(
+                      title: "View Resources",
+                      description: "Access resources shared by your teacher",
+                      icon: Icons.folder_open,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                StudentViewDownloadPage(user: widget.user),
+                          ),
+                        );
+                      },
+                    ),
+                  ]
+                : [],
+      ),
+      _buildResponsivePageContent(
         title: "chat",
         subtitle: "Manage exams and results",
         roleSpecificActions: widget.user.role == 'Teacher'
@@ -266,6 +307,10 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.school),
             label: 'Exams',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.folder),
+            label: 'Resources',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.chat),

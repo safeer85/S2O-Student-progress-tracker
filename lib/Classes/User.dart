@@ -8,6 +8,7 @@ class Customuser {
   String? stream;
   String? subject; // Now a single value
   String? childName;
+  String? batch;
 
   // Constructor
   Customuser({
@@ -20,6 +21,7 @@ class Customuser {
     this.stream,
     this.subject,
     this.childName,
+    this.batch,
   });
 
   // Factory constructor to create a User object from Firestore data
@@ -35,6 +37,7 @@ class Customuser {
       stream: data['stream'] as String?,
       subject: data['subject'] as String?, // Adjusted for single value
       childName: data['childName'] as String?,
+      batch: data['batch'] as String?,
     );
   }
 
@@ -49,6 +52,7 @@ class Customuser {
       'stream': stream,
       'subject': subject, // Adjusted for single value
       'childName': childName,
+      'batch': batch,
     };
   }
 }

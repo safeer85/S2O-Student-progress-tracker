@@ -21,6 +21,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   String? selectedRole;
   String? selectedStream;
+  String? selectedBatch;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -96,11 +97,17 @@ class _RegisterPageState extends State<RegisterPage> {
                         delay: Duration(milliseconds: 800),
                         child: _buildRoleDropdown(),
                       ),
-                      if (selectedRole == 'Student')
+                      if (selectedRole == 'Student') ...[
                         FadeInUp(
                           delay: Duration(milliseconds: 900),
                           child: _buildStreamDropdown(),
                         ),
+                        FadeInUp(
+                          delay: Duration(milliseconds: 1000),
+                          child:
+                              _buildBatchDropdown(), // Add batch dropdown here
+                        ),
+                      ],
                       if (selectedRole == 'Parent')
                         FadeInUp(
                           delay: Duration(milliseconds: 1000),
@@ -208,6 +215,25 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
+  Widget _buildBatchDropdown() {
+    return _buildDropdown(
+      'Batch',
+      Icons.school_outlined,
+      selectedBatch,
+      [
+        '2030',
+        '2029',
+        '2028',
+        '2027',
+        '2026',
+        '2025',
+        '2024',
+        '2023'
+      ], // List of batches
+      (value) => setState(() => selectedBatch = value),
+    );
+  }
+
   Widget _buildDropdown(String label, IconData icon, String? value,
       List<String> items, void Function(String?) onChanged) {
     return Card(
@@ -254,6 +280,7 @@ class _RegisterPageState extends State<RegisterPage> {
           stream: selectedRole == 'Student' ? selectedStream : null,
           childName:
               selectedRole == 'Parent' ? childNameController.text.trim() : null,
+          batch: selectedRole == 'Student' ? selectedBatch : null,
         );
 
         // Register the user using Firebase Authentication
