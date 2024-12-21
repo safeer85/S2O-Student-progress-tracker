@@ -52,8 +52,8 @@ class _LoginPageState extends State<LoginPage> {
             context,
             MaterialPageRoute(
               builder: (context) {
-                if (customUser.role == 'Principal') {
-                  // Navigate to the Principal Dashboard if the role is Principal
+                if (customUser.role == 'Admin') {
+                  // Navigate to the Admin Dashboard if the role is Principal
                   return PrincipalDashboard(user: customUser);
                 } else {
                   // Navigate to the Home Page for other roles

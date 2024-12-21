@@ -123,7 +123,7 @@ class _PrincipalDashboardState extends State<PrincipalDashboard> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Principal Dashboard',
+          'Admin Dashboard',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
         backgroundColor: Colors.teal,
