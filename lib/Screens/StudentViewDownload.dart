@@ -1,6 +1,11 @@
+import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'package:s20/Classes/SharedResource.dart';
 import 'package:s20/Classes/User.dart';
@@ -15,7 +20,6 @@ class StudentViewDownloadPage extends StatelessWidget {
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('sharedResources')
         .where('batch', isEqualTo: user.batch)
-        .orderBy('timestamp', descending: true)
         .get();
 
     return snapshot.docs
@@ -23,13 +27,150 @@ class StudentViewDownloadPage extends StatelessWidget {
         .toList();
   }
 
-  Future<void> _downloadFile(String fileUrl) async {
-    final Uri fileUri = Uri.parse(fileUrl);
-    if (await canLaunchUrl(fileUri)) {
-      await launchUrl(fileUri);
-    } else {
-      throw 'Could not launch $fileUrl';
+  /*Future<void> _downloadFile(
+      BuildContext context, String fileUrl, String fileName) async {
+    try {
+      final storagePermission = await Permission.storage.request();
+      if (storagePermission.isGranted) {
+        final directory = await _getDownloadDirectory();
+        if (directory != null) {
+          // Ensure the file name ends with .pdf
+          if (!fileName.toLowerCase().endsWith('.pdf')) {
+            fileName = '$fileName.pdf';
+          }
+          // final savePath = "${directory.path}/$fileName";
+
+          // Start the download
+          await FlutterDownloader.enqueue(
+            url: fileUrl,
+            savedDir: directory.path,
+            fileName: fileName,
+            showNotification: true,
+            openFileFromNotification: true,
+          );
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Download started: $fileName')),
+          );
+        } else {
+          throw 'Could not access storage directory';
+        }
+      } else if (storagePermission.isPermanentlyDenied) {
+        openAppSettings();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Please enable storage permissions in settings.')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Storage permission denied')),
+        );
+      }
+    } catch (e) {
+      print('Error downloading file: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to download the file')),
+      );
     }
+  }
+
+  Future<Directory?> _getDownloadDirectory() async {
+    final deviceInfo = DeviceInfoPlugin();
+    if (Platform.isAndroid) {
+      final androidInfo = await deviceInfo.androidInfo;
+      if (androidInfo.version.sdkInt >= 30) {
+        // For Android 11 and above
+        return await getExternalStorageDirectories(
+                type: StorageDirectory.downloads)
+            .then((dirs) => dirs?.first);
+      } else {
+        // For Android 10 and below
+        return await getExternalStorageDirectory();
+      }
+    }
+    return null; // You can add support for iOS or other platforms here if needed
+  }*/
+  Future<void> _downloadFile(
+      BuildContext context, String fileUrl, String fileName) async {
+    try {
+      final storagePermission = await Permission.storage.request();
+      if (storagePermission.isGranted) {
+        final directory = await _getDownloadDirectory();
+        if (directory != null) {
+          // Ensure the file name ends with .pdf
+          if (!fileName.toLowerCase().endsWith('.pdf')) {
+            fileName = '$fileName.pdf';
+          }
+
+          final savePath = "${directory.path}/$fileName";
+
+          // Check if the file already exists
+          if (await File(savePath).exists()) {
+            // File already exists, open it
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content: Text('File already downloaded, opening: $fileName')),
+            );
+            _openFile(savePath); // Open the file
+          } else {
+            // Start the download
+            await FlutterDownloader.enqueue(
+              url: fileUrl,
+              savedDir: directory.path,
+              fileName: fileName,
+              showNotification: true,
+              openFileFromNotification: true,
+            );
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Download started: $fileName')),
+            );
+          }
+        } else {
+          throw 'Could not access storage directory';
+        }
+      } else if (storagePermission.isPermanentlyDenied) {
+        openAppSettings();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Please enable storage permissions in settings.')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Storage permission denied')),
+        );
+      }
+    } catch (e) {
+      print('Error downloading file: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to download the file')),
+      );
+    }
+  }
+
+  Future<Directory?> _getDownloadDirectory() async {
+    final deviceInfo = DeviceInfoPlugin();
+    if (Platform.isAndroid) {
+      final androidInfo = await deviceInfo.androidInfo;
+      if (androidInfo.version.sdkInt >= 30) {
+        // For Android 11 and above
+        return await getExternalStorageDirectories(
+                type: StorageDirectory.downloads)
+            .then((dirs) => dirs?.first);
+      } else {
+        // For Android 10 and below
+        return await getExternalStorageDirectory();
+      }
+    }
+    return null; // You can add support for iOS or other platforms here if needed
+  }
+
+  void _openFile(String filePath) {
+    // Use an appropriate method to open the file depending on your app requirements
+    // For example, you can use the `open_file` package or `url_launcher` package to open the file
+    // Example:
+    OpenFile.open(filePath);
+    // or use any other file viewer/handler in your app.
   }
 
   @override
@@ -105,7 +246,8 @@ class StudentViewDownloadPage extends StatelessWidget {
                       ],
                     ),
                     trailing: ElevatedButton.icon(
-                      onPressed: () => _downloadFile(resource.fileUrl),
+                      onPressed: () => _downloadFile(
+                          context, resource.fileUrl, resource.title),
                       icon: Icon(Icons.download, color: Colors.white),
                       label: Text('Download'),
                       style: ElevatedButton.styleFrom(
@@ -125,82 +267,3 @@ class StudentViewDownloadPage extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
-
-
-
-/*import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-import 'package:s20/Classes/SharedResource.dart';
-import 'package:s20/Classes/User.dart';
-
-class StudentViewDownloadPage extends StatelessWidget {
-  final Customuser user;
-
-  const StudentViewDownloadPage({required this.user, Key? key})
-      : super(key: key);
-
-  Future<List<SharedResource>> _fetchSharedResources() async {
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
-        .collection('sharedResources')
-        .where('batch', isEqualTo: user.batch)
-        .orderBy('timestamp', descending: true)
-        .get();
-
-    return snapshot.docs
-        .map((doc) => SharedResource.fromFirestore(doc))
-        .toList();
-  }
-
-  Future<void> _downloadFile(String fileUrl) async {
-    final Uri fileUri = Uri.parse(fileUrl);
-    if (await canLaunchUrl(fileUri)) {
-      await launchUrl(fileUri);
-    } else {
-      throw 'Could not launch $fileUrl';
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('View Resources')),
-      body: FutureBuilder<List<SharedResource>>(
-        future: _fetchSharedResources(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No resources available'));
-          }
-
-          final resources = snapshot.data!;
-          return ListView.builder(
-            itemCount: resources.length,
-            itemBuilder: (context, index) {
-              final resource = resources[index];
-              return Card(
-                child: ListTile(
-                  title: Text(resource.title),
-                  subtitle: Text(resource.description),
-                  trailing: IconButton(
-                    icon: Icon(Icons.download),
-                    onPressed: () => _downloadFile(resource.fileUrl),
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-}*/

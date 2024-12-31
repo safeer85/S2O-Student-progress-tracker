@@ -1,6 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:s20/Routes/routes.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 //import 'package:cloud_firestore/cloud_firestore.dart';
@@ -25,6 +26,7 @@ Future<void> initializeNotifications() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await FlutterDownloader.initialize(debug: true);
   await Firebase.initializeApp();
   await initializeNotifications();
   // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
