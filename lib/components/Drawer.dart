@@ -60,9 +60,15 @@ class CustomDrawer extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const CircleAvatar(
+                    CircleAvatar(
                       radius: 35,
-                      // backgroundImage: AssetImage('path/to/profile/image'), // Optionally add profile image
+                      backgroundColor:
+                          Colors.grey[300], // Optional: Set background color
+                      child: Icon(
+                        Icons.person, // Profile logo icon
+                        size: 40, // Adjust the size of the icon
+                        color: Colors.grey[700], // Adjust the color of the icon
+                      ),
                     ),
                     const SizedBox(height: 9),
                     Text(
