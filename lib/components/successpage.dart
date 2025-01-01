@@ -5,25 +5,25 @@ class SubmissionSuccessPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Submission Successful'),
+        title: const Text('Submission Successful'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.check_circle, color: Colors.green, size: 100),
-            SizedBox(height: 20),
-            Text(
+            const Icon(Icons.check_circle, color: Colors.green, size: 100),
+            const SizedBox(height: 20),
+            const Text(
               'Marks have been successfully submitted!',
               style: TextStyle(fontSize: 18),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context); // Navigate back to the previous screen
               },
-              child: Text('Back to Marks Entry'),
+              child: const Text('Back to Marks Entry'),
             ),
           ],
         ),

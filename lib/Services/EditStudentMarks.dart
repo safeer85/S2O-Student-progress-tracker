@@ -30,7 +30,7 @@ class _EditMarksDialogState extends State<EditMarksDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Edit Marks'),
+      title: const Text('Edit Marks'),
       content: SingleChildScrollView(
         child: Column(
           children: _controllers.entries.map((entry) {
@@ -45,7 +45,7 @@ class _EditMarksDialogState extends State<EditMarksDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text('Cancel'),
+          child: const Text('Cancel'),
         ),
         TextButton(
           onPressed: () {
@@ -53,7 +53,7 @@ class _EditMarksDialogState extends State<EditMarksDialog> {
                 MapEntry(subject, controller.text.trim()));
             Navigator.pop(context, updatedMarks);
           },
-          child: Text('Save'),
+          child: const Text('Save'),
         ),
       ],
     );

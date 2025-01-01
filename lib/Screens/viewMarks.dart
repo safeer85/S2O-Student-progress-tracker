@@ -31,10 +31,10 @@ class _StudentMarksPageState extends State<StudentMarksPage> {
     if (studentId.isEmpty) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('Student Marks'),
+          title: const Text('Student Marks'),
           backgroundColor: Colors.blueAccent,
         ),
-        body: Center(
+        body: const Center(
           child: Text('You are not logged in.',
               style: TextStyle(fontSize: 18, color: Colors.red)),
         ),
@@ -43,24 +43,24 @@ class _StudentMarksPageState extends State<StudentMarksPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Student Marks'),
+        title: const Text('Student Marks'),
         backgroundColor: Colors.blueAccent,
       ),
       body: StreamBuilder<Map<String, Map<String, List<ExamMarks>>>>(
         stream: _examMarksStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.hasError) {
-            return Center(
+            return const Center(
                 child: Text('Something went wrong!',
                     style: TextStyle(color: Colors.red, fontSize: 16)));
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
+            return const Center(
                 child: Text('No marks found.',
                     style: TextStyle(fontSize: 18, color: Colors.grey)));
           }
@@ -68,11 +68,11 @@ class _StudentMarksPageState extends State<StudentMarksPage> {
           final groupedMarks = snapshot.data!;
 
           return ListView(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             children: groupedMarks.keys.map((subject) {
               return Card(
                 elevation: 5,
-                margin: EdgeInsets.symmetric(vertical: 10),
+                margin: const EdgeInsets.symmetric(vertical: 10),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -83,18 +83,18 @@ class _StudentMarksPageState extends State<StudentMarksPage> {
                     children: [
                       Text(
                         subject,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                             color: Colors.blueAccent),
                       ),
-                      Divider(),
+                      const Divider(),
                       ...groupedMarks[subject]!.keys.map((examType) {
                         final examMarksList = groupedMarks[subject]![examType]!;
                         return ExpansionTile(
                           title: Text(
                             'Exam Type: $examType',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w500,
                             ),
@@ -105,7 +105,7 @@ class _StudentMarksPageState extends State<StudentMarksPage> {
                                     .reduce((a, b) => a + b) ??
                                 0;
                             return Card(
-                              margin: EdgeInsets.all(8),
+                              margin: const EdgeInsets.all(8),
                               elevation: 3,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -113,7 +113,8 @@ class _StudentMarksPageState extends State<StudentMarksPage> {
                               child: ListTile(
                                 title: Text(
                                   'Exam Date: ${examMarks.examDate}',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
                                 ),
                                 subtitle: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,8 +123,8 @@ class _StudentMarksPageState extends State<StudentMarksPage> {
                                         'Stream: ${examMarks.stream ?? 'N/A'}'),
                                     Text(
                                         'Teacher: ${examMarks.teacherName ?? 'N/A'}'),
-                                    SizedBox(height: 10),
-                                    Text('Marks:',
+                                    const SizedBox(height: 10),
+                                    const Text('Marks:',
                                         style: TextStyle(
                                             fontWeight: FontWeight.w600)),
                                     ...(examMarks.marks?.entries.map((entry) {

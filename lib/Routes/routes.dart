@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:s20/Classes/Marks.dart';
 import 'package:s20/Screens/Announcement.dart';
 import 'package:s20/Screens/AnnouncementList.dart';
-//import 'package:s20/Screens/Exam.dart';
 import 'package:s20/Screens/MarkedAttendance.dart';
 import 'package:s20/Screens/ParentMarks.dart';
 import 'package:s20/Screens/Register.dart';
@@ -35,27 +33,22 @@ class AppRoutes {
 
   static Map<String, WidgetBuilder> routes = {
     splash: (context) => const SplashScreen(),
-    // home: (context) => const HomePage(),
     login: (context) => LoginPage(),
     register: (context) => RegisterPage(),
     takeAttendance: (context) => AttendancePage(),
     markedAttendance: (context) => MarkedAttendanceListPage(),
     announcement: (context) => CreateAnnouncementPage(),
     announcementlist: (context) => AnnouncementsListPage(),
-    viewAttendance: (context) => ViewAttendancePage(),
+    viewAttendance: (context) => const ViewAttendancePage(),
     viewAnnouncement: (context) => ViewAnnouncementPage(),
     setting: (context) => SettingsPage(),
-    //viewchildmarks: (context) => ViewMarksPage(),
-    viewChildAttendance:
-        (context) //=> AttendanceDetailPage(childName: childName)
-        {
+    viewChildAttendance: (context) {
       final String childName =
           ModalRoute.of(context)!.settings.arguments as String;
       return AttendanceDetailPage(
           childName: childName); // Pass childName to AttendanceDetailPage
     },
-    viewChildMarks: (context) //=> AttendanceDetailPage(childName: childName)
-        {
+    viewChildMarks: (context) {
       final String childName =
           ModalRoute.of(context)!.settings.arguments as String;
       return ViewChildMarksPage(
@@ -68,6 +61,5 @@ class AppRoutes {
       return ViewChildMarksPage(
           childName: childName); // Pass childName to AttendanceDetailPage
     }
-    // examMarks: (context) => ExamMarksEntryPage(teacherName: 'YourTeacherName')
   };
 }
