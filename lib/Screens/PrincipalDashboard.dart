@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:s20/Classes/User.dart';
 import 'package:s20/Screens/AddTeacherPage.dart';
+import 'package:s20/Screens/ManageAdmin.dart';
 import 'package:s20/Screens/ParentManagePage.dart';
 import 'package:s20/Screens/StudentManage.dart';
 import 'package:s20/components/Drawer.dart';
@@ -195,20 +196,11 @@ class _PrincipalDashboardState extends State<PrincipalDashboard> {
                   ),
                   _buildFeatureCard(
                     context,
-                    icon: Icons.person_add,
-                    title: 'Add Teacher',
+                    icon: Icons.person,
+                    title: 'Manage Teacher',
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        /*builder: (context) => AddTeacherPage(
-                          addTeacherFunction: _addTeacher,
-                          emailController: _emailController,
-                          firstNameController: _firstNameController,
-                          lastNameController: _lastNameController,
-                          passwordController: _passwordController,
-                          nameWithInitialController: _nameWithInitialController,
-                          subjectController: _subjectController,
-                        )*/
                         builder: (context) => AddTeacherPage(),
                       ),
                     ),
@@ -226,6 +218,17 @@ class _PrincipalDashboardState extends State<PrincipalDashboard> {
                           generateChatId: _generateChatId,
                         ),
                       ),
+                    ),
+                  ),
+
+                  _buildFeatureCard(
+                    context,
+                    icon: Icons.chat,
+                    title: 'Add another admin',
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ManageAdminsPage()),
                     ),
                   ),
                 ],
@@ -292,143 +295,6 @@ Widget _buildUserCountCard(String title, int count) {
     ),
   );
 }
-
-// Add Teacher Page
-/*class AddTeacherPage extends StatelessWidget {
-  final Function addTeacherFunction;
-  final TextEditingController emailController;
-  final TextEditingController firstNameController;
-  final TextEditingController lastNameController;
-  final TextEditingController passwordController;
-  final TextEditingController nameWithInitialController;
-  final TextEditingController subjectController;
-
-  const AddTeacherPage({
-    required this.addTeacherFunction,
-    required this.emailController,
-    required this.firstNameController,
-    required this.lastNameController,
-    required this.passwordController,
-    required this.nameWithInitialController,
-    required this.subjectController,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title:
-            Text('Add Teacher', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.teal,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            elevation: 5,
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Enter Teacher Details',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.teal,
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  _buildTextField(
-                    controller: firstNameController,
-                    labelText: 'First Name',
-                    keyboardType: TextInputType.name,
-                  ),
-                  _buildTextField(
-                    controller: lastNameController,
-                    labelText: 'Last Name',
-                    keyboardType: TextInputType.name,
-                  ),
-                  _buildTextField(
-                    controller: nameWithInitialController,
-                    labelText: 'Name with initial',
-                    keyboardType: TextInputType.name,
-                  ),
-                  _buildTextField(
-                    controller: subjectController,
-                    labelText: 'Subject',
-                    keyboardType: TextInputType.name,
-                  ),
-                  _buildTextField(
-                    controller: emailController,
-                    labelText: 'Email',
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  _buildTextField(
-                    controller: passwordController,
-                    labelText: 'Password',
-                    obscureText: true,
-                    keyboardType: TextInputType.visiblePassword,
-                  ),
-                  SizedBox(height: 20),
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: () => addTeacherFunction(),
-                      child: Text('Add Teacher'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.teal,
-                        padding:
-                            EdgeInsets.symmetric(vertical: 14, horizontal: 50),
-                        textStyle: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String labelText,
-    bool obscureText = false,
-    TextInputType keyboardType = TextInputType.text,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: labelText,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.teal.shade300),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.teal.shade500),
-          ),
-          filled: true,
-          fillColor: Colors.teal.shade50,
-        ),
-        obscureText: obscureText,
-        keyboardType: keyboardType,
-        style: TextStyle(fontSize: 16),
-      ),
-    );
-  }
-}*/
 
 // Teacher List Page
 class TeacherListPage extends StatelessWidget {
