@@ -5,7 +5,8 @@ class Attendance {
   String? teacherName;
   String? date; // Date in 'yyyy-MM-dd' format
   String? startTime; // Start time in a string format, e.g., '9:00 AM'
-  String? endTime; // End time in a string format, e.g., '9:15 AM'
+  String? endTime;
+  String? batch; // End time in a string format, e.g., '9:15 AM'
   Map<String, bool>?
       attendanceStatus; // Map of student IDs to their attendance status
 
@@ -17,6 +18,7 @@ class Attendance {
     this.startTime,
     this.endTime,
     this.attendanceStatus,
+    this.batch,
   });
 
   // Factory constructor to create an Attendance object from Firestore data
@@ -28,6 +30,7 @@ class Attendance {
       date: data['date'] as String?,
       startTime: data['startTime'] as String?,
       endTime: data['endTime'] as String?,
+      batch: data['batch'] as String?,
       attendanceStatus: data['attendanceStatus'] != null
           ? Map<String, bool>.from(data['attendanceStatus'])
           : null,
@@ -42,6 +45,7 @@ class Attendance {
       'startTime': startTime,
       'endTime': endTime,
       'attendanceStatus': attendanceStatus,
+      'batch': batch,
     };
   }
 }
