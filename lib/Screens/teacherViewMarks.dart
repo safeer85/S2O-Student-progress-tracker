@@ -16,7 +16,7 @@ class ViewMarksPage extends StatefulWidget {
 class _ViewMarksPageState extends State<ViewMarksPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  List<ExamMarks> _examMarks = [];
+  Map<String, Map<String, List<ExamMarks>>> _batchAndTypeWiseMarks = {};
   Map<String, String> _studentNames = {};
   bool _isLoading = true;
 
@@ -41,8 +41,18 @@ class _ViewMarksPageState extends State<ViewMarksPage> {
           marks.map((mark) => mark.studentId).whereType<String>().toSet();
       final studentNames = await _fetchStudentNames(studentIds);
 
+      final batchAndTypeWiseMarks = <String, Map<String, List<ExamMarks>>>{};
+      for (var mark in marks) {
+        final batch = mark.batch ?? 'Unknown Batch';
+        final examType = mark.examType ?? 'Unknown Exam Type';
+
+        batchAndTypeWiseMarks[batch] ??= {};
+        batchAndTypeWiseMarks[batch]![examType] ??= [];
+        batchAndTypeWiseMarks[batch]![examType]!.add(mark);
+      }
+
       setState(() {
-        _examMarks = marks;
+        _batchAndTypeWiseMarks = batchAndTypeWiseMarks;
         _studentNames = studentNames;
         _isLoading = false;
       });
@@ -61,7 +71,7 @@ class _ViewMarksPageState extends State<ViewMarksPage> {
         final doc = await _firestore.collection('users').doc(studentId).get();
         if (doc.exists) {
           final data = doc.data();
-          final name = '${data?['name with initial']} ';
+          final name = '${data?['name with initial']}';
           studentNames[studentId] = name;
         }
       }
@@ -71,13 +81,129 @@ class _ViewMarksPageState extends State<ViewMarksPage> {
     return studentNames;
   }
 
-  Future<void> _deleteMark(String id) async {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Marks for ${widget.user.subject}'),
+        backgroundColor: Colors.teal,
+        elevation: 0,
+      ),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : _batchAndTypeWiseMarks.isEmpty
+              ? const Center(
+                  child: Text(
+                    'No marks available.',
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: _batchAndTypeWiseMarks.keys.length,
+                  itemBuilder: (context, batchIndex) {
+                    final batch =
+                        _batchAndTypeWiseMarks.keys.elementAt(batchIndex);
+                    final examTypes = _batchAndTypeWiseMarks[batch]!;
+
+                    return ExpansionTile(
+                      title: Text(
+                        'Batch: $batch',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      children: examTypes.entries.map((entry) {
+                        final examType = entry.key;
+                        final marks = entry.value;
+
+                        return ExpansionTile(
+                          title: Text(
+                            'Exam Type: $examType',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          children: marks.map((mark) {
+                            final studentName =
+                                _studentNames[mark.studentId] ?? 'Unknown';
+                            return ListTile(
+                              title: Text(
+                                'Student: $studentName\nDate: ${mark.examDate}',
+                              ),
+                              subtitle: Text(
+                                'Marks: ${mark.marks?.entries.map((e) => '${e.key}: ${e.value}').join(', ')}',
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.edit,
+                                        color: Colors.blue),
+                                    onPressed: () =>
+                                        _editMark(mark, batch, examType),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete,
+                                        color: Colors.red),
+                                    onPressed: () =>
+                                        _deleteMark(mark.id!, batch, examType),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      }).toList(),
+                    );
+                  },
+                ),
+    );
+  }
+
+  Future<void> _editMark(ExamMarks mark, String batch, String examType) async {
+    final updatedMarks = await showDialog<Map<String, String>>(
+      context: context,
+      builder: (context) => EditMarksDialog(mark: mark),
+    );
+
+    if (updatedMarks != null) {
+      try {
+        await _firestore.collection('examMarks').doc(mark.id).update({
+          'marks': updatedMarks,
+        });
+
+        setState(() {
+          final index = _batchAndTypeWiseMarks[batch]![examType]
+              ?.indexWhere((m) => m.id == mark.id);
+          if (index != null && index != -1) {
+            _batchAndTypeWiseMarks[batch]![examType]?[index].marks =
+                updatedMarks;
+          }
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Marks updated successfully!')),
+        );
+      } catch (error) {
+        print('Error updating marks: $error');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Failed to update marks. Please try again.')),
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteMark(String id, String batch, String examType) async {
     bool? confirmDelete = await _showDeleteConfirmation();
     if (confirmDelete == true) {
       try {
         await _firestore.collection('examMarks').doc(id).delete();
         setState(() {
-          _examMarks.removeWhere((mark) => mark.id == id);
+          _batchAndTypeWiseMarks[batch]![examType]
+              ?.removeWhere((mark) => mark.id == id);
+          if (_batchAndTypeWiseMarks[batch]![examType]?.isEmpty ?? false) {
+            _batchAndTypeWiseMarks[batch]!.remove(examType);
+          }
+          if (_batchAndTypeWiseMarks[batch]?.isEmpty ?? false) {
+            _batchAndTypeWiseMarks.remove(batch);
+          }
         });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Marks deleted successfully!')),
@@ -109,94 +235,6 @@ class _ViewMarksPageState extends State<ViewMarksPage> {
           ),
         ],
       ),
-    );
-  }
-
-  Future<void> _editMark(ExamMarks mark) async {
-    final updatedMarks = await showDialog<Map<String, String>>(
-      context: context,
-      builder: (context) => EditMarksDialog(mark: mark),
-    );
-
-    if (updatedMarks != null) {
-      try {
-        await _firestore.collection('examMarks').doc(mark.id).update({
-          'marks': updatedMarks,
-        });
-
-        setState(() {
-          final index = _examMarks.indexWhere((m) => m.id == mark.id);
-          if (index != -1) {
-            _examMarks[index].marks = updatedMarks;
-          }
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Marks updated successfully!')),
-        );
-      } catch (error) {
-        print('Error updating marks: $error');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Failed to update marks. Please try again.')),
-        );
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Marks for ${widget.user.subject}'),
-        backgroundColor: Colors.teal,
-        elevation: 0,
-      ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : _examMarks.isEmpty
-              ? const Center(
-                  child: Text('No marks available.',
-                      style: TextStyle(fontSize: 18, color: Colors.grey)))
-              : ListView.builder(
-                  itemCount: _examMarks.length,
-                  itemBuilder: (context, index) {
-                    final mark = _examMarks[index];
-                    final studentName =
-                        _studentNames[mark.studentId] ?? 'Unknown';
-
-                    return Card(
-                      margin: const EdgeInsets.all(8.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 4,
-                      child: ListTile(
-                        title: Text(
-                          'Student: $studentName\nExam Type: ${mark.examType}\nDate: ${mark.examDate}',
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text(
-                          'Marks: ${mark.marks?.entries.map((e) => '${e.key}: ${e.value}').join(', ')}',
-                          style: TextStyle(color: Colors.grey[700]),
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit, color: Colors.blue),
-                              onPressed: () => _editMark(mark),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => _deleteMark(mark.id!),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
     );
   }
 }

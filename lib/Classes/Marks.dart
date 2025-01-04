@@ -9,7 +9,8 @@ class ExamMarks {
   String? studentId; // ID of the student
   String? teacherName; // Name of the teacher
   String? teacherSubject; // Subject taught by the teacher
-  Timestamp? timestamp; // Time the exam record was created
+  Timestamp? timestamp;
+  String? batch; // Time the exam record was created
 
   // Constructor
   ExamMarks({
@@ -22,6 +23,7 @@ class ExamMarks {
     this.teacherName,
     this.teacherSubject,
     this.timestamp,
+    this.batch,
   });
 
   // Factory constructor to create an ExamMarks object from Firestore data
@@ -39,6 +41,7 @@ class ExamMarks {
       teacherName: data['teacherName'] as String?,
       teacherSubject: data['teacherSubject'] as String?,
       timestamp: data['timestamp'] as Timestamp?,
+      batch: data['batch'] as String?,
     );
   }
 
@@ -53,6 +56,7 @@ class ExamMarks {
       'teacherName': teacherName,
       'teacherSubject': teacherSubject,
       'timestamp': timestamp,
+      'batch': batch,
     };
   }
 }
