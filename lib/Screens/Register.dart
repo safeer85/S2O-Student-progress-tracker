@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:s20/Classes/User.dart'; // Import your User class
+import 'package:s20/Classes/User.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -22,122 +22,127 @@ class _RegisterPageState extends State<RegisterPage> {
   String? selectedRole;
   String? selectedStream;
   String? selectedBatch;
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   bool _isLoading = false;
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Register"),
-        centerTitle: true,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF36D1DC), Color(0xFF5B86E5)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF000000), Color(0xFF0F1B2B)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
             ),
           ),
-        ),
-        elevation: 0,
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFFF5F7FA), Color(0xFFD7E1EC)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: _isLoading
-              ? Center(child: CircularProgressIndicator())
-              : Form(
-                  key: _formKey,
-                  child: ListView(
-                    children: [
-                      ZoomIn(child: _buildTitle()),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: _isLoading
+                  ? CircularProgressIndicator(color: Colors.blueAccent)
+                  : Form(
+                key: _formKey,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    ZoomIn(
+                      child: _buildTitle(),
+                    ),
+                    SizedBox(height: 20),
+                    FadeInLeft(
+                      child: _buildGlassCard(
+                        'First Name',
+                        firstNameController,
+                        Icons.person,
+                      ),
+                    ),
+                    FadeInRight(
+                      child: _buildGlassCard(
+                        'Last Name',
+                        lastNameController,
+                        Icons.person_outline,
+                      ),
+                    ),
+                    FadeInLeft(
+                      child: _buildGlassCard(
+                        'Name with Initial',
+                        nameInitialController,
+                        Icons.text_fields,
+                      ),
+                    ),
+                    FadeInRight(
+                      child: _buildGlassCard(
+                        'Email',
+                        emailController,
+                        Icons.email_outlined,
+                      ),
+                    ),
+                    FadeInLeft(
+                      child: _buildGlassCard(
+                        'Password',
+                        passwordController,
+                        Icons.lock_outline,
+                        obscureText: true,
+                      ),
+                    ),
+                    FadeInRight(
+                      child: _buildGlassCard(
+                        'Confirm Password',
+                        confirmPasswordController,
+                        Icons.lock,
+                        obscureText: true,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    BounceInUp(child: _buildRoleDropdown()),
+                    if (selectedRole == 'Student') ...[
                       FadeInUp(
-                        delay: Duration(milliseconds: 200),
-                        child: _buildCard(
-                            'First Name', firstNameController, Icons.person),
+                        child: _buildStreamDropdown(),
                       ),
                       FadeInUp(
-                        delay: Duration(milliseconds: 300),
-                        child: _buildCard(
-                            'Last Name', lastNameController, Icons.person),
+                        child: _buildBatchDropdown(),
                       ),
-                      FadeInUp(
-                        delay: Duration(milliseconds: 400),
-                        child: _buildCard('Name with Initial',
-                            nameInitialController, Icons.person_outline),
-                      ),
-                      FadeInUp(
-                        delay: Duration(milliseconds: 500),
-                        child:
-                            _buildCard('Email', emailController, Icons.email),
-                      ),
-                      FadeInUp(
-                        delay: Duration(milliseconds: 600),
-                        child: _buildCard(
-                            'Password', passwordController, Icons.lock,
-                            obscureText: true),
-                      ),
-                      FadeInUp(
-                        delay: Duration(milliseconds: 700),
-                        child: _buildCard('Confirm Password',
-                            confirmPasswordController, Icons.lock,
-                            obscureText: true),
-                      ),
-                      FadeInUp(
-                        delay: Duration(milliseconds: 800),
-                        child: _buildRoleDropdown(),
-                      ),
-                      if (selectedRole == 'Student') ...[
-                        FadeInUp(
-                          delay: Duration(milliseconds: 900),
-                          child: _buildStreamDropdown(),
-                        ),
-                        FadeInUp(
-                          delay: Duration(milliseconds: 1000),
-                          child:
-                              _buildBatchDropdown(), // Add batch dropdown here
-                        ),
-                      ],
-                      if (selectedRole == 'Parent')
-                        FadeInUp(
-                          delay: Duration(milliseconds: 1000),
-                          child: _buildChildNameField(),
-                        ),
-                      SizedBox(height: 20),
-                      Bounce(
-                        delay: Duration(milliseconds: 1200),
-                        child: ElevatedButton(
-                          onPressed: _register,
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                            elevation: 5,
-                            backgroundColor: Color(0xFF5B86E5),
-                          ),
-                          child: Text(
-                            'Register',
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          ),
-                        ),
-                      )
                     ],
-                  ),
+                    if (selectedRole == 'Parent')
+                      FadeInUp(
+                        child: _buildGlassCard(
+                          'Child Name',
+                          childNameController,
+                          Icons.child_care,
+                        ),
+                      ),
+                    SizedBox(height: 30),
+                    SlideInUp(
+                      child: ElevatedButton(
+                        onPressed: _register,
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 16), backgroundColor: Colors.blueAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                        ),
+                        child: Text(
+                          'Register',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-        ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -145,41 +150,40 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget _buildTitle() {
     return Column(
       children: [
-        Icon(Icons.app_registration, size: 80, color: Color(0xFF5B86E5)),
+        Icon(Icons.person_add_alt, size: 80, color: Colors.blueAccent),
         SizedBox(height: 16),
         Text(
-          "Register Account",
+          "Create Your Account",
           style: TextStyle(
-              fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
-        SizedBox(height: 16),
       ],
     );
   }
 
-  Widget _buildCard(
-      String label, TextEditingController controller, IconData icon,
-      {bool obscureText = false}) {
+  Widget _buildGlassCard(String label, TextEditingController controller,
+      IconData icon, {bool obscureText = false}) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 8,
+      color: Colors.white.withOpacity(0.05),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: TextFormField(
           controller: controller,
           obscureText: obscureText,
+          style: TextStyle(color: Colors.white),
           decoration: InputDecoration(
             labelText: label,
-            prefixIcon: Icon(icon, color: Color(0xFF5B86E5)),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            filled: true,
-            fillColor: Colors.white,
+            labelStyle: TextStyle(color: Colors.white70),
+            prefixIcon: Icon(icon, color: Colors.blueAccent),
+            border: InputBorder.none,
           ),
           validator: (value) => value == null || value.isEmpty
-              ? 'Please enter your $label'
+              ? 'Please enter $label'
               : null,
         ),
       ),
@@ -191,12 +195,8 @@ class _RegisterPageState extends State<RegisterPage> {
       'Role',
       Icons.people,
       selectedRole,
-      [
-        'Student',
-        'Parent',
-        'Admin',
-      ],
-      (value) {
+      ['Student', 'Parent', 'Admin'],
+          (value) {
         setState(() {
           selectedRole = value;
           selectedStream = null;
@@ -211,61 +211,47 @@ class _RegisterPageState extends State<RegisterPage> {
       Icons.school,
       selectedStream,
       ['Physical Science', 'Biological Science'],
-      (value) => setState(() => selectedStream = value),
+          (value) => setState(() => selectedStream = value),
     );
   }
 
   Widget _buildBatchDropdown() {
     return _buildDropdown(
       'Batch',
-      Icons.school_outlined,
+      Icons.timeline,
       selectedBatch,
-      [
-        '2030',
-        '2029',
-        '2028',
-        '2027',
-        '2026',
-        '2025',
-        '2024',
-        '2023'
-      ], // List of batches
-      (value) => setState(() => selectedBatch = value),
+      ['2030', '2029', '2028', '2027'],
+          (value) => setState(() => selectedBatch = value),
     );
   }
 
   Widget _buildDropdown(String label, IconData icon, String? value,
       List<String> items, void Function(String?) onChanged) {
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(20),
+      ),
       margin: const EdgeInsets.symmetric(vertical: 8),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: DropdownButtonFormField<String>(
-          decoration: InputDecoration(
-            labelText: label,
-            prefixIcon: Icon(icon, color: Color(0xFF5B86E5)),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            filled: true,
-            fillColor: Colors.white,
-          ),
-          value: value,
-          items: items
-              .map((item) => DropdownMenuItem(value: item, child: Text(item)))
-              .toList(),
-          onChanged: onChanged,
-          validator: (value) => value == null ? 'Please select a $label' : null,
+      padding: const EdgeInsets.all(16.0),
+      child: DropdownButtonFormField<String>(
+        dropdownColor: Colors.black,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(color: Colors.white70),
+          icon: Icon(icon, color: Colors.blueAccent),
+          border: InputBorder.none,
         ),
+        value: value,
+        items: items
+            .map((item) => DropdownMenuItem(value: item, child: Text(item)))
+            .toList(),
+        onChanged: onChanged,
+        style: TextStyle(color: Colors.white),
+        validator: (value) => value == null ? 'Please select $label' : null,
       ),
     );
   }
-
-  Widget _buildChildNameField() {
-    return _buildCard(
-        'Child/Children\'s Name(s)', childNameController, Icons.child_care);
-  }
-
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
@@ -279,13 +265,13 @@ class _RegisterPageState extends State<RegisterPage> {
           role: selectedRole,
           stream: selectedRole == 'Student' ? selectedStream : null,
           childName:
-              selectedRole == 'Parent' ? childNameController.text.trim() : null,
+          selectedRole == 'Parent' ? childNameController.text.trim() : null,
           batch: selectedRole == 'Student' ? selectedBatch : null,
         );
 
         // Register the user using Firebase Authentication
         UserCredential userCredential =
-            await _auth.createUserWithEmailAndPassword(
+        await _auth.createUserWithEmailAndPassword(
           email: emailController.text.trim(),
           password: passwordController.text.trim(),
         );
@@ -307,3 +293,5 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 }
+
+
