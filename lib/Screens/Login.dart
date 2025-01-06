@@ -1,12 +1,11 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:s20/Screens/Home.dart';
-import 'package:s20/Classes/User.dart'; // Make sure this import is correct
-import 'package:s20/Classes/Marks.dart';
+import 'package:s20/Classes/User.dart';
 import 'package:s20/Screens/PrincipalDashboard.dart';
+import 'dart:developer';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -17,55 +16,41 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   bool isLoading = false;
 
   Future<void> loginUser() async {
     if (_formKey.currentState!.validate()) {
+      log('Attempting login with email: ${emailController.text}');
       setState(() {
         isLoading = true;
       });
-
       try {
-        UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: emailController.text.trim(),
           password: passwordController.text.trim(),
         );
-
-        DocumentSnapshot userDoc = await _firestore
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
             .collection('users')
             .doc(userCredential.user!.uid)
             .get();
-
         if (userDoc.exists) {
-          // Fetching the user data and mapping it to the Customuser class
           Customuser customUser = Customuser.fromFirestore(
             userDoc.data() as Map<String, dynamic>,
             userDoc.id,
           );
-          String role = customUser.role ?? 'user';
-
-          //Using the custom user's role to navigate
-
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) {
-                if (customUser.role == 'Admin') {
-                  // Navigate to the Admin Dashboard if the role is Principal
-                  return PrincipalDashboard(user: customUser);
-                } else {
-                  // Navigate to the Home Page for other roles
-                  return HomePage(user: customUser);
-                }
-              },
+              builder: (context) => customUser.role == 'Admin'
+                  ? PrincipalDashboard(user: customUser)
+                  : HomePage(user: customUser),
             ),
           );
         } else {
           throw Exception('User data not found');
         }
       } catch (e) {
+        log('Login failed: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Login failed: ${e.toString()}")),
         );
@@ -80,184 +65,135 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Login"),
-        centerTitle: true,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF7F00FF), Color(0xFFE100FF)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
-        elevation: 0,
-      ),
       body: Stack(
         children: [
-          // Gradient Background
           Container(
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF7F00FF), Color(0xFF00B4DB)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+              gradient: RadialGradient(
+                colors: [Colors.blue.shade900, Colors.black],
+                center: Alignment.topCenter,
+                radius: 2,
               ),
             ),
           ),
-          // Semi-transparent overlay
-          Container(
-            color: Colors.black.withOpacity(0.3),
-          ),
-          Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ZoomIn(
-                      duration: Duration(milliseconds: 500),
-                      child: Container(
-                        margin: EdgeInsets.only(bottom: 20),
-                        child: Image.asset(
-                          'assets/images/logo.png', // Replace with your logo path
-                          height: 100,
+          Align(
+            alignment: Alignment.center,
+            child: ZoomIn(
+              child: GlassCard(
+                child: Padding(
+                  padding: const EdgeInsets.all(30.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        FadeInDown(
+                          child: Image.asset(
+                            'assets/images/logo.png',
+                            height: 70,
+                          ),
                         ),
-                      ),
-                    ),
-                    FadeInDown(
-                      duration: Duration(milliseconds: 600),
-                      child: Column(
-                        children: [
-                          Text(
-                            "Welcome Back!",
+                        SizedBox(height: 20),
+                        FadeInLeft(
+                          child: Text(
+                            'Hello, Welcome Back!',
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            "Sign in to access your account.",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white70,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    FadeInUp(
-                      duration: Duration(milliseconds: 700),
-                      child: TextFormField(
-                        controller: emailController,
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                          prefixIcon: Icon(Icons.email, color: Colors.white),
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                            borderSide: BorderSide.none,
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                            borderSide:
-                                BorderSide(color: Colors.white, width: 2),
                           ),
                         ),
-                        validator: (value) => value == null ||
-                                value.isEmpty ||
-                                !value.contains('@')
-                            ? 'Please enter a valid email'
-                            : null,
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    FadeInUp(
-                      duration: Duration(milliseconds: 800),
-                      child: TextFormField(
-                        controller: passwordController,
-                        decoration: InputDecoration(
-                          labelText: 'Password',
-                          prefixIcon: Icon(Icons.lock, color: Colors.white),
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                            borderSide: BorderSide.none,
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                            borderSide:
-                                BorderSide(color: Colors.white, width: 2),
-                          ),
+                        SizedBox(height: 15),
+                        Text(
+                          'Sign in with your account',
+                          style: TextStyle(fontSize: 16, color: Colors.white70),
                         ),
-                        obscureText: true,
-                        validator: (value) => value == null || value.isEmpty
-                            ? 'Please enter your password'
-                            : null,
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    Bounce(
-                      duration: Duration(milliseconds: 900),
-                      child: isLoading
-                          ? Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                              ),
-                            )
-                          : ElevatedButton(
-                              onPressed: loginUser,
-                              style: ElevatedButton.styleFrom(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 100, vertical: 15),
-                                backgroundColor: Colors.blue[700],
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12.0),
-                                ),
-                                elevation: 5,
-                              ),
-                              child: Text(
-                                'Login',
-                                style: TextStyle(
-                                    fontSize: 18, color: Colors.white),
+                        SizedBox(height: 30),
+                        SlideInUp(
+                          child: TextFormField(
+                            controller: emailController,
+                            style: TextStyle(color: Colors.white),
+                            decoration: InputDecoration(
+                              labelText: 'Email Address',
+                              labelStyle: TextStyle(color: Colors.white),
+                              prefixIcon: Icon(Icons.email, color: Colors.white),
+                              filled: true,
+                              fillColor: Colors.white24,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                borderSide: BorderSide.none,
                               ),
                             ),
-                    ),
-                    SizedBox(height: 20),
-                    FadeInUp(
-                      duration: Duration(milliseconds: 1000),
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/register');
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.person_add, color: Colors.white),
-                            SizedBox(width: 8),
-                            Text(
-                              "Don't have an account? Register",
+                            validator: (value) {
+                              if (value == null || value.isEmpty || !value.contains('@')) {
+                                return 'Enter a valid email';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        SlideInUp(
+                          child: TextFormField(
+                            controller: passwordController,
+                            obscureText: true,
+                            style: TextStyle(color: Colors.white),
+                            decoration: InputDecoration(
+                              labelText: 'Password',
+                              labelStyle: TextStyle(color: Colors.white),
+                              prefixIcon: Icon(Icons.lock, color: Colors.white),
+                              filled: true,
+                              fillColor: Colors.white24,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Enter your password';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 30),
+                        FlipInX(
+                          child: isLoading
+                              ? CircularProgressIndicator()
+                              : ElevatedButton(
+                            onPressed: loginUser,
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 15, horizontal: 100), backgroundColor: Colors.blueAccent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                            ),
+                            child: Text(
+                              'Login',
                               style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                                 color: Colors.white,
-                                fontSize: 16,
-                                decoration: TextDecoration.underline,
                               ),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
+                        SizedBox(height: 20),
+                        TextButton(
+                          onPressed: () => Navigator.pushNamed(context, '/register'),
+                          child: Text(
+                            "Don't have an account? Register",
+                            style: TextStyle(
+                              color: Colors.blue.shade300,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -272,5 +208,29 @@ class _LoginPageState extends State<LoginPage> {
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
+  }
+}
+
+class GlassCard extends StatelessWidget {
+  final Widget child;
+  GlassCard({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(25),
+        border: Border.all(color: Colors.white.withOpacity(0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 30,
+            offset: Offset(0, 10),
+          ),
+        ],
+      ),
+      child: child,
+    );
   }
 }

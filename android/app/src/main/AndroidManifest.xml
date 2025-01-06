@@ -10,7 +10,7 @@
     <!-- Optional but recommended -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <application
-        android:label="s20"
+        android:label="S2O SPT"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
