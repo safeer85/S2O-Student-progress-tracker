@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:s20/Screens/Login.dart';
 
 class AddTeacherPage extends StatefulWidget {
   @override
@@ -54,6 +55,10 @@ class _AddTeacherPageState extends State<AddTeacherPage> {
         );
 
         _clearFields();
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+        );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

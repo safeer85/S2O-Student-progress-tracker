@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:s20/Classes/User.dart'; // Import your User class
+import 'package:s20/Classes/User.dart';
+import 'package:s20/Screens/Login.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -194,7 +195,6 @@ class _RegisterPageState extends State<RegisterPage> {
       [
         'Student',
         'Parent',
-        'Admin',
       ],
       (value) {
         setState(() {
@@ -296,7 +296,29 @@ class _RegisterPageState extends State<RegisterPage> {
             .doc(userCredential.user!.uid)
             .set(user.toFirestore());
 
-        Navigator.pushReplacementNamed(context, '/login');
+        //Registration success
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Registration Successful')),
+        );
+
+        // Clear the text fields
+        firstNameController.clear();
+        lastNameController.clear();
+        nameInitialController.clear();
+        emailController.clear();
+        passwordController.clear();
+        childNameController.clear();
+        setState(() {
+          selectedRole = null;
+          selectedStream = null;
+          selectedBatch = null;
+        });
+        Navigator.pop(context, true);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+        );
+        //setState(() => _userDetails = fetchUserDetails());
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Registration failed: ${e.toString()}')),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:s20/Screens/Login.dart';
 
 class ManageAdminsPage extends StatefulWidget {
   @override
@@ -49,7 +50,11 @@ class _ManageAdminsPageState extends State<ManageAdminsPage> {
         );
 
         _clearFields();
-        Navigator.pop(context); // Close the dialog after adding the admin
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+        ); // Close the dialog after adding the admin
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

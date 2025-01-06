@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import 'package:s20/Classes/User.dart'; // Make sure this import is correct
 import 'package:s20/Routes/routes.dart';
@@ -75,6 +76,7 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
                   ],
+        role: widget.user.role,
       ),
       _buildResponsivePageContent(
         title: "Announcements",
@@ -108,6 +110,7 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
               ],
+        role: widget.user.role,
       ),
       _buildResponsivePageContent(
         title: "Exams",
@@ -175,6 +178,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ]
                     : [],
+        role: widget.user.role,
       ),
       _buildResponsivePageContent(
         title: "Resources",
@@ -214,6 +218,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ]
                 : [],
+        role: widget.user.role,
       ),
       _buildResponsivePageContent(
         title: "chat",
@@ -269,6 +274,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ]
                     : [],
+        role: widget.user.role,
       ),
     ];
 
@@ -330,7 +336,18 @@ class _HomePageState extends State<HomePage> {
     required String title,
     required String subtitle,
     required List<Widget> roleSpecificActions,
+    required String? role, // Pass the user's role as a parameter
   }) {
+    const String youtubeUrl =
+        "https://www.youtube.com/watch?v=dQw4w9WgXcQ"; // Replace with your YouTube URL
+    final YoutubePlayerController _controller = YoutubePlayerController(
+      initialVideoId: YoutubePlayer.convertUrlToId(youtubeUrl) ?? '',
+      flags: const YoutubePlayerFlags(
+        autoPlay: false,
+        mute: false,
+      ),
+    );
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -353,6 +370,38 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(height: 20),
                 ...roleSpecificActions,
+                const SizedBox(height: 20),
+                // Show the YouTube player only if the role is "Student"
+                if (role == "Student") ...[
+                  const Text(
+                    "🌟 \"Education is the passport to the future, for tomorrow belongs to those who prepare for it today.\" – Malcolm X",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontStyle: FontStyle.italic,
+                      color: Colors.blueAccent,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    "💡 \"The beautiful thing about learning is that no one can take it away from you.\" – B.B. King",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontStyle: FontStyle.italic,
+                      color: Colors.green,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  YoutubePlayer(
+                    controller: _controller,
+                    showVideoProgressIndicator: true,
+                    progressIndicatorColor: Colors.blueAccent,
+                    onReady: () {
+                      debugPrint("YouTube player is ready.");
+                    },
+                  ),
+                ]
               ],
             ),
           ),
@@ -361,42 +410,58 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /*Widget _buildFeatureCard({
+  /*Widget _buildResponsivePageContent({
     required String title,
-    required String description,
-    required IconData icon,
-    required VoidCallback onPressed,
+    required String subtitle,
+    required List<Widget> roleSpecificActions,
   }) {
-    return Card(
-      elevation: 5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        onTap: onPressed,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              Icon(icon, size: 40),
-              SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  Text(description),
-                ],
-              ),
-            ],
-          ),
-        ),
+    const String youtubeUrl =
+        "https://www.youtube.com/watch?v=dQw4w9WgXcQ"; // Replace with your YouTube URL
+    final YoutubePlayerController _controller = YoutubePlayerController(
+      initialVideoId: YoutubePlayer.convertUrlToId(youtubeUrl) ?? '',
+      flags: const YoutubePlayerFlags(
+        autoPlay: false,
+        mute: false,
       ),
     );
-  }
-}*/
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  subtitle,
+                  style: const TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+                const SizedBox(height: 20),
+                ...roleSpecificActions,
+                const SizedBox(height: 8),
+                YoutubePlayer(
+                  controller: _controller,
+                  showVideoProgressIndicator: true,
+                  progressIndicatorColor: Colors.blueAccent,
+                  onReady: () {
+                    debugPrint("YouTube player is ready.");
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }*/
 
   Widget _buildFeatureCard({
     required String title,

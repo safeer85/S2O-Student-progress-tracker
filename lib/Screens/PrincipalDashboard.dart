@@ -4,6 +4,7 @@ import 'package:s20/Classes/User.dart';
 import 'package:s20/Screens/AddTeacherPage.dart';
 import 'package:s20/Screens/ManageAdmin.dart';
 import 'package:s20/Screens/ParentManagePage.dart';
+import 'package:s20/Screens/Register.dart';
 import 'package:s20/Screens/StudentManage.dart';
 import 'package:s20/components/Drawer.dart';
 import 'ChatPage.dart';
@@ -88,6 +89,11 @@ class _PrincipalDashboardState extends State<PrincipalDashboard> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Teacher added successfully!')),
       );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => PrincipalDashboard(user: widget.user)),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please fill in all fields')),
@@ -121,6 +127,147 @@ class _PrincipalDashboardState extends State<PrincipalDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Admin Dashboard',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        ),
+        backgroundColor: Colors.teal,
+      ),
+      drawer: const CustomDrawer(),
+      body: RefreshIndicator(
+        onRefresh: _onRefresh, // Call the refresh function
+        child: Container(
+          padding: EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.teal.shade300, Colors.teal.shade100],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Welcome, ${widget.user.nameWithInitial}',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 20),
+
+              // Display the counts of users, teachers, students, and parents
+              Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                children: [
+                  _buildUserCountCard('Total Users', totalUsers),
+                  _buildUserCountCard('Teachers', teachersCount),
+                  _buildUserCountCard('Students', studentsCount),
+                  _buildUserCountCard('Parents', parentsCount),
+                ],
+              ),
+              SizedBox(height: 20),
+              SizedBox(height: 20),
+
+              Expanded(
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  children: [
+                    _buildFeatureCard(
+                      context,
+                      icon: Icons.app_registration,
+                      title: 'User Registration',
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              RegisterPage(), // Navigate to Parent Manage Page
+                        ),
+                      ),
+                    ),
+                    _buildFeatureCard(
+                      context,
+                      icon: Icons.school,
+                      title: 'Manage Students',
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              StudentManagePage(), // Navigate to Student Manage Page
+                        ),
+                      ),
+                    ),
+                    // Card for managing parents
+                    _buildFeatureCard(
+                      context,
+                      icon: Icons.family_restroom,
+                      title: 'Manage Parents',
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ParentManagePage(), // Navigate to Parent Manage Page
+                        ),
+                      ),
+                    ),
+                    _buildFeatureCard(
+                      context,
+                      icon: Icons.person,
+                      title: 'Manage Teacher',
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddTeacherPage(),
+                        ),
+                      ),
+                    ),
+                    _buildFeatureCard(
+                      context,
+                      icon: Icons.chat,
+                      title: 'Chat with Teachers',
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TeacherListPage(
+                            getTeachersStream: _getTeachers,
+                            currentUser: widget.user,
+                            generateChatId: _generateChatId,
+                          ),
+                        ),
+                      ),
+                    ),
+                    _buildFeatureCard(
+                      context,
+                      icon: Icons.chat,
+                      title: 'Add another admin',
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ManageAdminsPage()),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+// Refresh function to reload data
+  Future<void> _onRefresh() async {
+    // Trigger a data refresh. You can reload the data (like user counts) here.
+    await _fetchUserCounts();
+    // This is assuming you have this method to update the counts
+    setState(() {}); // Refresh the UI by calling setState
+  }
+
+  /*Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -168,6 +315,18 @@ class _PrincipalDashboardState extends State<PrincipalDashboard> {
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
                 children: [
+                  _buildFeatureCard(
+                    context,
+                    icon: Icons.app_registration,
+                    title: 'User Registration',
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            RegisterPage(), // Navigate to Parent Manage Page
+                      ),
+                    ),
+                  ),
                   _buildFeatureCard(
                     context,
                     icon: Icons.school,
@@ -238,7 +397,7 @@ class _PrincipalDashboardState extends State<PrincipalDashboard> {
         ),
       ),
     );
-  }
+  }*/
 
   Widget _buildFeatureCard(BuildContext context,
       {required IconData icon,
