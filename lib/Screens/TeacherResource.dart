@@ -87,7 +87,11 @@ class _TeacherResourceSharePageState extends State<TeacherResourceSharePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Share Resource')),
+      appBar: AppBar(
+        title: const Text('Share Resource'),
+        backgroundColor:
+            const Color.fromARGB(255, 44, 100, 183), // Dark blue AppBar
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -134,6 +138,9 @@ class _TeacherResourceSharePageState extends State<TeacherResourceSharePage> {
               label: Text(isUploading ? 'Uploading...' : 'Upload File'),
               style: ElevatedButton.styleFrom(
                 minimumSize: Size(double.infinity, 48),
+                backgroundColor:
+                    const Color.fromARGB(255, 44, 100, 183), // Dark blue button
+                foregroundColor: Colors.white, // White text color
               ),
             ),
             if (uploadedFileUrl != null)
@@ -150,6 +157,9 @@ class _TeacherResourceSharePageState extends State<TeacherResourceSharePage> {
               child: Text('Share Resource'),
               style: ElevatedButton.styleFrom(
                 minimumSize: Size(double.infinity, 48),
+                backgroundColor:
+                    const Color.fromARGB(255, 44, 100, 183), // Dark blue button
+                foregroundColor: Colors.white, // White text color
               ),
             ),
           ],

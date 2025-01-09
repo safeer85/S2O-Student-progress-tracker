@@ -65,7 +65,7 @@ class _UserListPageState extends State<UserListPage> {
           'Chat with Users',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: const Color.fromARGB(255, 44, 100, 183), // Dark blue
       ),
       body: StreamBuilder<List<Customuser>>(
         stream: _getUsers(),

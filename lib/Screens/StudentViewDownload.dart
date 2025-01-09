@@ -178,7 +178,7 @@ class StudentViewDownloadPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('View Resources'),
-        backgroundColor: Colors.teal,
+        backgroundColor: const Color.fromARGB(255, 44, 100, 183),
       ),
       body: FutureBuilder<List<SharedResource>>(
         future: _fetchSharedResources(),
@@ -249,9 +249,13 @@ class StudentViewDownloadPage extends StatelessWidget {
                       onPressed: () => _downloadFile(
                           context, resource.fileUrl, resource.title),
                       icon: Icon(Icons.download, color: Colors.white),
-                      label: Text('Download'),
+                      label: const Text(
+                        'Download',
+                        style: TextStyle(color: Colors.white),
+                      ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.teal,
+                        backgroundColor:
+                            const Color.fromARGB(255, 44, 100, 183),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),

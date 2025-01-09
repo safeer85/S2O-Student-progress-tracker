@@ -7,6 +7,7 @@ import 'package:s20/Screens/ParentManagePage.dart';
 import 'package:s20/Screens/Register.dart';
 import 'package:s20/Screens/StudentManage.dart';
 import 'package:s20/components/Drawer.dart';
+import 'package:s20/components/linkeditpage.dart';
 import 'ChatPage.dart';
 
 class PrincipalDashboard extends StatefulWidget {
@@ -247,6 +248,16 @@ class _PrincipalDashboardState extends State<PrincipalDashboard> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => ManageAdminsPage()),
+                      ),
+                    ),
+                    _buildFeatureCard(
+                      context,
+                      icon: Icons.chat,
+                      title: 'Video link Edit',
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AdminUpdateYoutubeLinkPage()),
                       ),
                     ),
                   ],

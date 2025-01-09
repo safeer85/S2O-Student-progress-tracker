@@ -25,7 +25,8 @@ class _LoginPageState extends State<LoginPage> {
         isLoading = true;
       });
       try {
-        UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        UserCredential userCredential =
+            await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: emailController.text.trim(),
           password: passwordController.text.trim(),
         );
@@ -63,7 +64,142 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                colors: [Colors.blue.shade900, Colors.black],
+                center: Alignment.topCenter,
+                radius: 2,
+              ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.center,
+            child: SingleChildScrollView(
+              // Added for scrolling
+              child: ZoomIn(
+                child: GlassCard(
+                  child: Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          FadeInDown(
+                              child: Image.asset('assets/images/logo.png',
+                                  height: 70)),
+                          SizedBox(height: 20),
+                          FadeInLeft(
+                            child: Text(
+                              'Hello, Welcome Back!',
+                              style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                          ),
+                          SizedBox(height: 15),
+                          Text('Sign in with your account',
+                              style: TextStyle(
+                                  fontSize: 16, color: Colors.white70)),
+                          SizedBox(height: 30),
+                          SlideInUp(
+                            child: TextFormField(
+                              controller: emailController,
+                              style: TextStyle(color: Colors.white),
+                              decoration: InputDecoration(
+                                labelText: 'Email Address',
+                                labelStyle: TextStyle(color: Colors.white),
+                                prefixIcon:
+                                    Icon(Icons.email, color: Colors.white),
+                                filled: true,
+                                fillColor: Colors.white24,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null ||
+                                    value.isEmpty ||
+                                    !value.contains('@')) {
+                                  return 'Enter a valid email';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          SlideInUp(
+                            child: TextFormField(
+                              controller: passwordController,
+                              obscureText: true,
+                              style: TextStyle(color: Colors.white),
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                labelStyle: TextStyle(color: Colors.white),
+                                prefixIcon:
+                                    Icon(Icons.lock, color: Colors.white),
+                                filled: true,
+                                fillColor: Colors.white24,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Enter your password';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          SizedBox(height: 30),
+                          FlipInX(
+                            child: isLoading
+                                ? CircularProgressIndicator()
+                                : ElevatedButton(
+                                    onPressed: loginUser,
+                                    style: ElevatedButton.styleFrom(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 15, horizontal: 100),
+                                      backgroundColor: Colors.blueAccent,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(25)),
+                                    ),
+                                    child: Text(
+                                      'Login',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
+                                  ),
+                          ),
+                          SizedBox(height: 20),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /*Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
@@ -201,7 +337,7 @@ class _LoginPageState extends State<LoginPage> {
         ],
       ),
     );
-  }
+  }*/
 
   @override
   void dispose() {

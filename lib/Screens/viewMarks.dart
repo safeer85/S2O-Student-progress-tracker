@@ -44,7 +44,7 @@ class _StudentMarksPageState extends State<StudentMarksPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Student Marks'),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: const Color.fromARGB(255, 44, 100, 183), // Dark blue
       ),
       body: StreamBuilder<Map<String, Map<String, List<ExamMarks>>>>(
         stream: _examMarksStream,

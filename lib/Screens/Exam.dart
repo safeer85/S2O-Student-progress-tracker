@@ -168,6 +168,8 @@ class _EnterMarksPageState extends State<EnterMarksPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Enter Marks for ${widget.user.subject}'),
+        backgroundColor: const Color.fromARGB(
+            255, 44, 100, 183), // Dark blue background color
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -178,6 +180,11 @@ class _EnterMarksPageState extends State<EnterMarksPage> {
               // Select batch button
               ElevatedButton(
                 onPressed: () => _selectBatch(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(
+                      255, 44, 100, 183), // Dark blue button
+                  foregroundColor: Colors.white, // White text color
+                ),
                 child: Text(
                   _selectedBatch == null
                       ? 'Select Batch'
@@ -189,7 +196,22 @@ class _EnterMarksPageState extends State<EnterMarksPage> {
 
               // Exam Type field
               TextFormField(
-                decoration: InputDecoration(labelText: 'Exam Type'),
+                decoration: InputDecoration(
+                  labelText: 'Exam Type',
+                  labelStyle: TextStyle(
+                      color: const Color.fromARGB(
+                          255, 44, 100, 183)), // Dark blue label color
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                        color: const Color.fromARGB(
+                            255, 44, 100, 183)), // Dark blue border color
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                        color: const Color.fromARGB(
+                            255, 44, 100, 183)), // Dark blue border color
+                  ),
+                ),
                 onSaved: (value) => _examType = value ?? '',
                 validator: (value) =>
                     value!.isEmpty ? 'Please enter exam type' : null,
@@ -211,6 +233,11 @@ class _EnterMarksPageState extends State<EnterMarksPage> {
                   SizedBox(width: 10),
                   ElevatedButton(
                     onPressed: () => _selectExamDate(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(
+                          255, 44, 100, 183), // Dark blue button
+                      foregroundColor: Colors.white, // White text color
+                    ),
                     child: Text('Select Date'),
                   ),
                 ],
@@ -234,8 +261,28 @@ class _EnterMarksPageState extends State<EnterMarksPage> {
                               SizedBox(width: 10),
                               Expanded(
                                 child: TextFormField(
-                                  decoration:
-                                      InputDecoration(labelText: 'Marks'),
+                                  decoration: InputDecoration(
+                                    labelText: 'Marks',
+                                    labelStyle: TextStyle(
+                                        color: const Color.fromARGB(255, 44,
+                                            100, 183)), // Dark blue label color
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: const Color.fromARGB(
+                                              255,
+                                              44,
+                                              100,
+                                              183)), // Dark blue border color
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: const Color.fromARGB(
+                                              255,
+                                              44,
+                                              100,
+                                              183)), // Dark blue border color
+                                    ),
+                                  ),
                                   onSaved: (value) {
                                     if (value != null && value.isNotEmpty) {
                                       _marks[student['id']!] = value;
@@ -256,6 +303,11 @@ class _EnterMarksPageState extends State<EnterMarksPage> {
               // Save button
               ElevatedButton(
                 onPressed: _saveMarks,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(
+                      255, 44, 100, 183), // Dark blue button
+                  foregroundColor: Colors.white, // White text color
+                ),
                 child: Text('Save Marks'),
               ),
             ],

@@ -86,7 +86,7 @@ class _ViewMarksPageState extends State<ViewMarksPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Marks for ${widget.user.subject}'),
-        backgroundColor: Colors.teal,
+        backgroundColor: const Color.fromARGB(255, 44, 100, 183),
         elevation: 0,
       ),
       body: _isLoading

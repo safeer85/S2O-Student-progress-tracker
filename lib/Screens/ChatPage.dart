@@ -103,7 +103,7 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Chat with $receiverName'),
-        backgroundColor: Color(0xFF3A86FF),
+        backgroundColor: const Color.fromARGB(255, 44, 100, 183), // Dark blue
         centerTitle: true,
       ),
       body: Column(

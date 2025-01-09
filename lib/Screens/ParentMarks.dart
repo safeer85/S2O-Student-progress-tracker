@@ -39,7 +39,7 @@ class _ViewChildMarksPageState extends State<ViewChildMarksPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Marks Details - ${widget.childName}'),
-        backgroundColor: Colors.teal,
+        backgroundColor: const Color.fromARGB(255, 44, 100, 183),
       ),
       body: FutureBuilder<String>(
         future: _childIdFuture,
