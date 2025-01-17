@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:s20/Routes/routes.dart';
 import 'package:s20/components/Drawer.dart';
 
@@ -25,93 +24,93 @@ class _HomePageState extends State<HomePage> {
         subtitle: "Manage attendance efficiently",
         roleSpecificActions: widget.role == 'Teacher'
             ? [
-          _buildFeatureCard(
-            title: "Take Attendance",
-            description: "Record attendance for your class",
-            icon: Icons.check_circle,
-            onPressed: () {
-              Navigator.pushNamed(context, '/takeAttendance');
-            },
-          ),
-          _buildFeatureCard(
-            title: "See Recorded Attendance",
-            description: "View attendance records",
-            icon: Icons.list_alt,
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.markedAttendance);
-            },
-          ),
-        ]
+                _buildFeatureCard(
+                  title: "Take Attendance",
+                  description: "Record attendance for your class",
+                  icon: Icons.check_circle,
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/takeAttendance');
+                  },
+                ),
+                _buildFeatureCard(
+                  title: "See Recorded Attendance",
+                  description: "View attendance records",
+                  icon: Icons.list_alt,
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.markedAttendance);
+                  },
+                ),
+              ]
             : [
-          _buildFeatureCard(
-            title: "View Attendance",
-            description: "See your attendance records",
-            icon: Icons.visibility,
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.viewAttendance);
-            },
-          ),
-        ],
+                _buildFeatureCard(
+                  title: "View Attendance",
+                  description: "See your attendance records",
+                  icon: Icons.visibility,
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.viewAttendance);
+                  },
+                ),
+              ],
       ),
       _buildResponsivePageContent(
         title: "Announcements",
         subtitle: "Stay updated with the latest news",
         roleSpecificActions: widget.role == 'Teacher'
             ? [
-          _buildFeatureCard(
-            title: "Post Announcement",
-            description: "Share important updates",
-            icon: Icons.announcement,
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.announcement);
-            },
-          ),
-          _buildFeatureCard(
-            title: "View Announcements",
-            description: "Browse past announcements",
-            icon: Icons.list,
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.announcementlist);
-            },
-          ),
-        ]
+                _buildFeatureCard(
+                  title: "Post Announcement",
+                  description: "Share important updates",
+                  icon: Icons.announcement,
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.announcement);
+                  },
+                ),
+                _buildFeatureCard(
+                  title: "View Announcements",
+                  description: "Browse past announcements",
+                  icon: Icons.list,
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.announcementlist);
+                  },
+                ),
+              ]
             : [
-          _buildFeatureCard(
-            title: "View Announcements",
-            description: "Check updates and notices",
-            icon: Icons.announcement,
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.viewAnnouncement);
-            },
-          ),
-        ],
+                _buildFeatureCard(
+                  title: "View Announcements",
+                  description: "Check updates and notices",
+                  icon: Icons.announcement,
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.viewAnnouncement);
+                  },
+                ),
+              ],
       ),
       _buildResponsivePageContent(
         title: "Exams",
         subtitle: "Manage and track exam performance",
         roleSpecificActions: widget.role == 'Teacher'
             ? [
-          _buildFeatureCard(
-            title: "Enter Exam Marks",
-            description: "Record student marks",
-            icon: Icons.task,
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.examMarks);
-            },
-          ),
-        ]
+                _buildFeatureCard(
+                  title: "Enter Exam Marks",
+                  description: "Record student marks",
+                  icon: Icons.task,
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.examMarks);
+                  },
+                ),
+              ]
             : widget.role == 'Parent'
-            ? [
-          _buildFeatureCard(
-            title: "View Marks",
-            description: "Check your child's performance",
-            icon: Icons.task,
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.viewchildmarks);
-            },
-          ),
-        ]
-            : [],
+                ? [
+                    _buildFeatureCard(
+                      title: "View Marks",
+                      description: "Check your child's performance",
+                      icon: Icons.task,
+                      onPressed: () {
+                        Navigator.pushNamed(context, AppRoutes.viewchildmarks);
+                      },
+                    ),
+                  ]
+                : [],
       ),
     ];
 

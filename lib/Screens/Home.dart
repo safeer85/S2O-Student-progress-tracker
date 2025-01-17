@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:animate_do/animate_do.dart';
+
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import 'package:s20/Classes/User.dart'; // Make sure this import is correct

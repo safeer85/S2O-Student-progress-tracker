@@ -185,7 +185,7 @@ class _AddTeacherPageState extends State<AddTeacherPage> {
           itemCount: teachers.length,
           itemBuilder: (context, index) {
             final teacher = teachers[index];
-            final userId = teacher.id;
+            //final userId = teacher.id;
             final data = teacher.data() as Map<String, dynamic>;
 
             return Card(
