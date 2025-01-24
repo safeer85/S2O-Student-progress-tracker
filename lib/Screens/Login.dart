@@ -25,25 +25,38 @@ class _LoginPageState extends State<LoginPage> {
         isLoading = true;
       });
       try {
+        // Authenticate the user
         UserCredential userCredential =
-            await FirebaseAuth.instance.signInWithEmailAndPassword(
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: emailController.text.trim(),
           password: passwordController.text.trim(),
         );
+
+        // Fetch user document
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
             .collection('users')
             .doc(userCredential.user!.uid)
             .get();
+
         if (userDoc.exists) {
+          // Parse user document
           Customuser customUser = Customuser.fromFirestore(
             userDoc.data() as Map<String, dynamic>,
             userDoc.id,
           );
+
+          // Update isOnline status
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userCredential.user!.uid)
+              .update({'isOnline': true});
+
+          // Navigate to appropriate dashboard
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => customUser.role == 'Admin'
-                  ? PrincipalDashboard(user: customUser)
+                  ? AdminDashboard(user: customUser)
                   : HomePage(user: customUser),
             ),
           );
@@ -62,7 +75,6 @@ class _LoginPageState extends State<LoginPage> {
       }
     }
   }
-
   @override
   @override
   Widget build(BuildContext context) {

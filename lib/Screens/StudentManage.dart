@@ -1,26 +1,35 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import 'EditStudentPage.dart';
+import 'StudentDetailsPage.dart';
+
 class StudentManagePage extends StatelessWidget {
-  // Fetch students from Firestore where role is 'Student'
-  Stream<List<Map<String, dynamic>>> _getStudents() {
+  Stream<Map<String, List<Map<String, dynamic>>>> _getStudentsGroupedByBatch() {
     return FirebaseFirestore.instance
         .collection('users')
         .where('role', isEqualTo: 'Student')
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => {
-                  'id': doc.id,
-                  'firstName': doc['firstName'],
-                  'lastName': doc['lastName'],
-                  'email': doc['email'],
-                  'name with initial': doc['name with initial'],
-                  'stream': doc['stream'],
-                })
-            .toList());
+        .map((snapshot) {
+      Map<String, List<Map<String, dynamic>>> groupedByBatch = {};
+      for (var doc in snapshot.docs) {
+        final data = {
+          'id': doc.id,
+          'firstName': doc['firstName'],
+          'lastName': doc['lastName'],
+          'email': doc['email'],
+          'name with initial': doc['name with initial'],
+          'stream': doc['stream'],
+          'batch': doc['batch'],
+        };
+
+        final batch = doc['batch'] ?? 'Unknown'; // Default batch if missing
+        groupedByBatch.putIfAbsent(batch, () => []).add(data);
+      }
+      return groupedByBatch;
+    });
   }
 
-  // Function to delete a student
   void _deleteStudent(BuildContext context, String studentId) async {
     try {
       await FirebaseFirestore.instance
@@ -43,7 +52,6 @@ class StudentManagePage extends StatelessWidget {
     }
   }
 
-  // Navigate to the edit page
   void _editStudent(BuildContext context, Map<String, dynamic> student) {
     Navigator.push(
       context,
@@ -53,340 +61,117 @@ class StudentManagePage extends StatelessWidget {
     );
   }
 
+  void _viewStudentDetails(BuildContext context, Map<String, dynamic> student) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => StudentDetailPage(student: student),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Student Management'),
-        backgroundColor: Color(0xFF3A86FF),
+        backgroundColor: Colors.blueAccent,
       ),
-      body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: _getStudents(),
+      body: StreamBuilder<Map<String, List<Map<String, dynamic>>>>(
+        stream: _getStudentsGroupedByBatch(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator.adaptive());
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Error fetching data'));
+            return Center(
+              child: Text(
+                'Error fetching data',
+                style: TextStyle(color: Colors.red),
+              ),
+            );
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No students found'));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.group, size: 100, color: Colors.grey),
+                  SizedBox(height: 10),
+                  Text(
+                    'No students found',
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                ],
+              ),
+            );
           }
 
-          final students = snapshot.data!;
-          return ListView.builder(
-            itemCount: students.length,
-            itemBuilder: (context, index) {
-              final student = students[index];
+          final groupedByBatch = snapshot.data!;
+          return ListView(
+            padding: EdgeInsets.all(16),
+            children: groupedByBatch.entries.map((entry) {
+              final batch = entry.key;
+              final students = entry.value;
+
               return Card(
-                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                child: ListTile(
+                elevation: 5,
+                margin: EdgeInsets.only(bottom: 16),
+                child: ExpansionTile(
                   leading: CircleAvatar(
                     backgroundColor: Colors.blueAccent,
-                    child: Text(student['name with initial'][0]),
+                    child: Text(
+                      batch[0], // First letter of batch
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                   title: Text(
-                    student['name with initial'],
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    'Batch: $batch',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  subtitle: Text('Email: ${student['email']}'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.edit, color: Colors.blue),
-                        onPressed: () => _editStudent(context, student),
+                  subtitle: Text('${students.length} students'),
+                  children: students.map((student) {
+                    return ListTile(
+                      onTap: () => _viewStudentDetails(context, student),
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.blueAccent,
+                        child: Text(
+                          student['name with initial'][0],
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
-                      IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _deleteStudent(context, student['id']),
+                      title: Text(
+                        student['name with initial'],
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                    ],
-                  ),
+                      subtitle: Text('Email: ${student['email']}'),
+                      trailing: Wrap(
+                        spacing: 8,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.edit, color: Colors.blue),
+                            onPressed: () => _editStudent(context, student),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.delete, color: Colors.red),
+                            onPressed: () =>
+                                _deleteStudent(context, student['id']),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
                 ),
               );
-            },
+            }).toList(),
           );
         },
       ),
     );
   }
 }
-
-class EditStudentPage extends StatelessWidget {
-  final Map<String, dynamic> student;
-  final TextEditingController _firstNameController;
-  final TextEditingController _lastNameController;
-  final TextEditingController _emailController;
-  final TextEditingController _namewithinitialController;
-
-  EditStudentPage({required this.student})
-      : _firstNameController =
-            TextEditingController(text: student['firstName']),
-        _lastNameController = TextEditingController(text: student['lastName']),
-        _emailController = TextEditingController(text: student['email']),
-        _namewithinitialController =
-            TextEditingController(text: student['name with initial']);
-
-  Future<void> _updateStudent(BuildContext context) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(student['id'])
-          .update({
-        'firstName': _firstNameController.text,
-        'lastName': _lastNameController.text,
-        'email': _emailController.text,
-        'name with initial': _namewithinitialController.text,
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Student updated successfully'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      Navigator.pop(context);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error updating student'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Edit Student'),
-        backgroundColor: Color(0xFF3A86FF),
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _firstNameController,
-              decoration: InputDecoration(
-                labelText: 'First Name',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 10),
-            TextField(
-              controller: _lastNameController,
-              decoration: InputDecoration(
-                labelText: 'Last Name',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 10),
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 10),
-            TextField(
-              controller: _namewithinitialController,
-              decoration: InputDecoration(
-                labelText: 'Name with Initial',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: () => _updateStudent(context),
-              icon: Icon(Icons.save),
-              label: Text('Update Student'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-
-
-/*import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-
-class StudentManagePage extends StatelessWidget {
-  // Fetch students from Firestore where role is 'Student'
-  Stream<List<Map<String, dynamic>>> _getStudents() {
-    return FirebaseFirestore.instance
-        .collection('users') // Reference to the users collection
-        .where('role', isEqualTo: 'Student') // Filter by role 'Student'
-        .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => {
-                  'id': doc.id,
-                  'firstName': doc['firstName'],
-                  'lastName': doc['lastName'],
-                  'email': doc['email'],
-                  'name with initial': doc['name with initial'],
-                  'stream': doc['stream'],
-                  // Add other student fields if needed
-                })
-            .toList());
-  }
-
-  // Function to delete a student
-  void _deleteStudent(BuildContext context, String studentId) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(studentId)
-          .delete();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Student deleted successfully')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error deleting student')),
-      );
-    }
-  }
-
-  // Function to navigate to the edit page
-  void _editStudent(BuildContext context, Map<String, dynamic> student) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditStudentPage(student: student),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Student Management'),
-      ),
-      body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: _getStudents(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return Center(child: Text('Error fetching data'));
-          }
-
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No students found'));
-          }
-
-          final students = snapshot.data!;
-
-          return ListView.builder(
-            itemCount: students.length,
-            itemBuilder: (context, index) {
-              final student = students[index];
-              return Card(
-                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                child: ListTile(
-                  title: Text('${student['name with initial']} '),
-                  subtitle: Text('Email: ${student['email']}'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed: () => _editStudent(context, student),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.delete),
-                        onPressed: () => _deleteStudent(context, student['id']),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-}
-
-class EditStudentPage extends StatelessWidget {
-  final Map<String, dynamic> student;
-  final TextEditingController _firstNameController;
-  final TextEditingController _lastNameController;
-  final TextEditingController _emailController;
-  final TextEditingController _namewithinitialController;
-
-  EditStudentPage({required this.student})
-      : _firstNameController =
-            TextEditingController(text: student['firstName']),
-        _lastNameController = TextEditingController(text: student['lastName']),
-        _emailController = TextEditingController(text: student['email']),
-        _namewithinitialController =
-            TextEditingController(text: student['name with initial']);
-
-  // Function to update the student data
-  Future<void> _updateStudent() async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(student['id'])
-          .update({
-        'firstName': _firstNameController.text,
-        'lastName': _lastNameController.text,
-        'email': _emailController.text,
-        'name with initial': _namewithinitialController.text,
-      });
-      // After updating, go back to the previous page
-    } catch (e) {
-      print('Error updating student: $e');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Edit Student'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _firstNameController,
-              decoration: InputDecoration(labelText: 'First Name'),
-            ),
-            TextField(
-              controller: _lastNameController,
-              decoration: InputDecoration(labelText: 'Last Name'),
-            ),
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(labelText: 'Email'),
-            ),
-            TextField(
-              controller: _namewithinitialController,
-              decoration: InputDecoration(labelText: 'name with initial'),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _updateStudent,
-              child: Text('Update Student'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}*/

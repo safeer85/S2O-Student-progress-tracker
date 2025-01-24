@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Customuser {
   String? id; // Firestore document ID
   String? email;
@@ -6,9 +9,10 @@ class Customuser {
   String? nameWithInitial;
   String? role;
   String? stream;
-  String? subject; // Now a single value
+  String? subject;
   String? childName;
   String? batch;
+  bool? isOnline; // New field for online status
 
   // Constructor
   Customuser({
@@ -22,6 +26,7 @@ class Customuser {
     this.subject,
     this.childName,
     this.batch,
+    this.isOnline,
   });
 
   // Factory constructor to create a User object from Firestore data
@@ -35,9 +40,10 @@ class Customuser {
       nameWithInitial: data['name with initial'] as String?,
       role: data['role'] as String?,
       stream: data['stream'] as String?,
-      subject: data['subject'] as String?, // Adjusted for single value
+      subject: data['subject'] as String?,
       childName: data['childName'] as String?,
       batch: data['batch'] as String?,
+      isOnline: data['isOnline'] as bool?,
     );
   }
 
@@ -50,9 +56,10 @@ class Customuser {
       'name with initial': nameWithInitial,
       'role': role,
       'stream': stream,
-      'subject': subject, // Adjusted for single value
+      'subject': subject,
       'childName': childName,
       'batch': batch,
+      'isOnline': isOnline,
     };
   }
 }

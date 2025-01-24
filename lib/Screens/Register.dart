@@ -18,11 +18,10 @@ class _RegisterPageState extends State<RegisterPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
-  final childNameController = TextEditingController();
-
   String? selectedRole;
   String? selectedStream;
   String? selectedBatch;
+  String? selectedChildName; // For storing the selected child name
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   bool _isLoading = false;
@@ -47,100 +46,94 @@ class _RegisterPageState extends State<RegisterPage> {
               child: _isLoading
                   ? CircularProgressIndicator(color: Colors.blueAccent)
                   : Form(
-                      key: _formKey,
-                      child: ListView(
-                        shrinkWrap: true,
-                        children: [
-                          ZoomIn(
-                            child: _buildTitle(),
-                          ),
-                          SizedBox(height: 20),
-                          FadeInLeft(
-                            child: _buildGlassCard(
-                              'First Name',
-                              firstNameController,
-                              Icons.person,
-                            ),
-                          ),
-                          FadeInRight(
-                            child: _buildGlassCard(
-                              'Last Name',
-                              lastNameController,
-                              Icons.person_outline,
-                            ),
-                          ),
-                          FadeInLeft(
-                            child: _buildGlassCard(
-                              'Name with Initial',
-                              nameInitialController,
-                              Icons.text_fields,
-                            ),
-                          ),
-                          FadeInRight(
-                            child: _buildGlassCard(
-                              'Email',
-                              emailController,
-                              Icons.email_outlined,
-                            ),
-                          ),
-                          FadeInLeft(
-                            child: _buildGlassCard(
-                              'Password',
-                              passwordController,
-                              Icons.lock_outline,
-                              obscureText: true,
-                            ),
-                          ),
-                          FadeInRight(
-                            child: _buildGlassCard(
-                              'Confirm Password',
-                              confirmPasswordController,
-                              Icons.lock,
-                              obscureText: true,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          BounceInUp(child: _buildRoleDropdown()),
-                          if (selectedRole == 'Student') ...[
-                            FadeInUp(
-                              child: _buildStreamDropdown(),
-                            ),
-                            FadeInUp(
-                              child: _buildBatchDropdown(),
-                            ),
-                          ],
-                          if (selectedRole == 'Parent')
-                            FadeInUp(
-                              child: _buildGlassCard(
-                                'Child Name',
-                                childNameController,
-                                Icons.child_care,
-                              ),
-                            ),
-                          SizedBox(height: 30),
-                          SlideInUp(
-                            child: ElevatedButton(
-                              onPressed: _register,
-                              style: ElevatedButton.styleFrom(
-                                padding: EdgeInsets.symmetric(vertical: 16),
-                                backgroundColor: Colors.blueAccent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                              ),
-                              child: Text(
-                                'Register',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                key: _formKey,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    ZoomIn(child: _buildTitle()),
+                    SizedBox(height: 20),
+                    FadeInLeft(
+                      child: _buildGlassCard(
+                        'First Name',
+                        firstNameController,
+                        Icons.person,
                       ),
                     ),
+                    FadeInRight(
+                      child: _buildGlassCard(
+                        'Last Name',
+                        lastNameController,
+                        Icons.person_outline,
+                      ),
+                    ),
+                    FadeInLeft(
+                      child: _buildGlassCard(
+                        'Name with Initial',
+                        nameInitialController,
+                        Icons.text_fields,
+                      ),
+                    ),
+                    FadeInRight(
+                      child: _buildGlassCard(
+                        'Email',
+                        emailController,
+                        Icons.email_outlined,
+                      ),
+                    ),
+                    FadeInLeft(
+                      child: _buildGlassCard(
+                        'Password',
+                        passwordController,
+                        Icons.lock_outline,
+                        obscureText: true,
+                      ),
+                    ),
+                    FadeInRight(
+                      child: _buildGlassCard(
+                        'Confirm Password',
+                        confirmPasswordController,
+                        Icons.lock,
+                        obscureText: true,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    BounceInUp(child: _buildRoleDropdown()),
+                    if (selectedRole == 'Student') ...[
+                      FadeInUp(
+                        child: _buildStreamDropdown(),
+                      ),
+                      FadeInUp(
+                        child: _buildBatchField(),
+                      ),
+                    ],
+                    if (selectedRole == 'Parent')
+                      FadeInUp(
+                        child: _buildChildDropdown(),
+                      ),
+                    SizedBox(height: 30),
+                    SlideInUp(
+                      child: ElevatedButton(
+                        onPressed: _register,
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor: Colors.blueAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                        ),
+                        child: Text(
+                          'Register',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ],
@@ -185,7 +178,7 @@ class _RegisterPageState extends State<RegisterPage> {
             border: InputBorder.none,
           ),
           validator: (value) =>
-              value == null || value.isEmpty ? 'Please enter $label' : null,
+          value == null || value.isEmpty ? 'Please enter $label' : null,
         ),
       ),
     );
@@ -196,14 +189,12 @@ class _RegisterPageState extends State<RegisterPage> {
       'Role',
       Icons.people,
       selectedRole,
-      [
-        'Student',
-        'Parent',
-      ],
-      (value) {
+      ['Student', 'Parent'],
+          (value) {
         setState(() {
           selectedRole = value;
           selectedStream = null;
+          selectedBatch = null;
         });
       },
     );
@@ -215,17 +206,119 @@ class _RegisterPageState extends State<RegisterPage> {
       Icons.school,
       selectedStream,
       ['Physical Science', 'Biological Science'],
-      (value) => setState(() => selectedStream = value),
+          (value) => setState(() => selectedStream = value),
     );
   }
 
-  Widget _buildBatchDropdown() {
-    return _buildDropdown(
-      'Batch',
-      Icons.timeline,
-      selectedBatch,
-      ['2030', '2029', '2028', '2027'],
-      (value) => setState(() => selectedBatch = value),
+  Widget _buildBatchField() {
+    return InkWell(
+      onTap: () async {
+        showDialog(
+          context: context,
+          builder: (context) {
+            int currentYear = DateTime.now().year;
+            return AlertDialog(
+              title: Text('Select Batch Year'),
+              content: Container(
+                width: double.maxFinite,
+                height: 250,
+                child: YearPicker(
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2100),
+                  initialDate: DateTime.now(),
+                  selectedDate: selectedBatch != null
+                      ? DateTime(int.parse(selectedBatch!))
+                      : DateTime.now(),
+                  onChanged: (DateTime dateTime) {
+                    setState(() {
+                      selectedBatch = dateTime.year.toString();
+                    });
+                    Navigator.pop(context); // Close the dialog after selection
+                  },
+                ),
+              ),
+            );
+          },
+        );
+      },
+      child: Container(
+        padding: EdgeInsets.all(16.0),
+        margin: EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.calendar_today, color: Colors.blueAccent),
+            SizedBox(width: 16),
+            Text(
+              selectedBatch ?? 'Select Batch Year',
+              style: TextStyle(
+                color: selectedBatch == null ? Colors.white70 : Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChildDropdown() {
+    return FutureBuilder<QuerySnapshot>(
+      future: _firestore
+          .collection('users')
+          .where('role', isEqualTo: 'Student')
+          .get(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError || !snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(
+            child: Text(
+              'No students found',
+              style: TextStyle(color: Colors.white70),
+            ),
+          );
+        }
+
+        final students = snapshot.data!.docs;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.all(16.0),
+          child: DropdownButtonFormField<String>(
+            dropdownColor: Colors.black,
+            decoration: InputDecoration(
+              labelText: 'Child Name',
+              labelStyle: TextStyle(color: Colors.white70),
+              icon: Icon(Icons.child_care, color: Colors.blueAccent),
+              border: InputBorder.none,
+            ),
+            value: selectedChildName,
+            items: students
+                .map((student) {
+              final data = student.data() as Map<String, dynamic>;
+              final name = data['name with initial'] ?? 'Unnamed';
+              return DropdownMenuItem<String>(
+                value: name,
+                child: Text(name),
+              );
+            })
+                .toList(),
+            onChanged: (value) => setState(() => selectedChildName = value),
+            style: TextStyle(color: Colors.white),
+            validator: (value) =>
+            value == null ? 'Please select a child name' : null,
+          ),
+        );
+      },
     );
   }
 
@@ -261,7 +354,6 @@ class _RegisterPageState extends State<RegisterPage> {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
       try {
-        // Create a User object from the form data
         Customuser user = Customuser(
           firstName: firstNameController.text.trim(),
           lastName: lastNameController.text.trim(),
@@ -269,47 +361,41 @@ class _RegisterPageState extends State<RegisterPage> {
           email: emailController.text.trim(),
           role: selectedRole,
           stream: selectedRole == 'Student' ? selectedStream : null,
-          childName:
-              selectedRole == 'Parent' ? childNameController.text.trim() : null,
+          childName: selectedRole == 'Parent' ? selectedChildName : null,
           batch: selectedRole == 'Student' ? selectedBatch : null,
         );
 
-        // Register the user using Firebase Authentication
         UserCredential userCredential =
-            await _auth.createUserWithEmailAndPassword(
+        await _auth.createUserWithEmailAndPassword(
           email: emailController.text.trim(),
           password: passwordController.text.trim(),
         );
 
-        // Store the User object data in Firestore
         await _firestore
             .collection('users')
             .doc(userCredential.user!.uid)
             .set(user.toFirestore());
 
-        //Registration success
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Registration Successful')),
         );
 
-        // Clear the text fields
         firstNameController.clear();
         lastNameController.clear();
         nameInitialController.clear();
         emailController.clear();
         passwordController.clear();
-        childNameController.clear();
         setState(() {
           selectedRole = null;
           selectedStream = null;
           selectedBatch = null;
+          selectedChildName = null;
         });
-        Navigator.pop(context, true);
+
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => LoginPage()),
         );
-        //setState(() => _userDetails = fetchUserDetails());
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Registration failed: ${e.toString()}')),
