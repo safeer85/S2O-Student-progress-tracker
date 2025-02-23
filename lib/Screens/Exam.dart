@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
@@ -165,6 +166,17 @@ class _EnterMarksPageState extends State<EnterMarksPage> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      // Redirect to login if no user is logged in
+      Future.microtask(() {
+        Navigator.pushReplacementNamed(context, '/login');
+      });
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text('Enter Marks for ${widget.user.subject}'),

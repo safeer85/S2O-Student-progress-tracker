@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../Classes/User.dart';
@@ -16,6 +17,16 @@ class TeacherListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    if (currentUser == null) {
+      // Redirect to login if no user is logged in
+      Future.microtask(() {
+        Navigator.pushReplacementNamed(context, '/login');
+      });
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chat with Teachers'),

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // For date formatting
 
@@ -36,6 +37,17 @@ class _ViewChildMarksPageState extends State<ViewChildMarksPage> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      // Redirect to login if no user is logged in
+      Future.microtask(() {
+        Navigator.pushReplacementNamed(context, '/login');
+      });
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text('Marks Details - ${widget.childName}'),

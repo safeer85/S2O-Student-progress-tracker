@@ -62,7 +62,6 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
       notificationDetails,
     );
   }
-
   Future<void> _checkIfTeacher() async {
     String? uid = _auth.currentUser?.uid;
     if (uid != null) {
@@ -77,12 +76,14 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
 
   Future<void> _postAnnouncement() async {
     if (_titleController.text.isEmpty || _contentController.text.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Please fill in all fields.")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please fill in all fields.")),
+      );
       return;
     }
 
     try {
+      // Add announcement to Firestore
       await _firestore.collection('announcements').add({
         'title': _titleController.text,
         'content': _contentController.text,
@@ -90,75 +91,82 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
         'timestamp': FieldValue.serverTimestamp(),
         'targetAudience': targetAudience,
       });
-      // Send notification to selected topics
-      /*for (String audience in targetAudience) {
-        await _sendFCMNotification(audience);
-      }*/
 
-      await FirebaseMessaging.instance.subscribeToTopic("announcements");
+      // Send notification using FCM
+      for (String audience in targetAudience) {
+        await sendNotificationToTopic(audience);
+      }
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Announcement posted!")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Announcement posted!")),
+      );
 
       _titleController.clear();
       _contentController.clear();
-
-      await flutterLocalNotificationsPlugin.show(
-        0,
-        "Announcement Sent",
-        "Your announcement was posted successfully!",
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            'teacher_notification_channel',
-            'Teacher Notifications',
-            importance: Importance.high,
-            priority: Priority.high,
-            showWhen: false,
-          ),
-        ),
-      );
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Error posting announcement.")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error posting announcement.")),
+      );
     }
   }
 
-  /*Future<void> _sendFCMNotification(String topic) async {
-    // Use your backend or an HTTP library to send the FCM notification
-    final String serverKey =
-        ''; // Replace with your FCM server key
-    final String fcmEndpoint = 'https://fcm.googleapis.com/fcm/send';
+  Future<void> sendNotificationToTopic(String topic) async {
+    final url = Uri.parse('https://fcm.googleapis.com/fcm/send');
+    final serverKey = '117615282849711579033'; // Replace with your Firebase server key
 
-    final Map<String, dynamic> notificationData = {
-      'to': '/topics/$topic',
-      'notification': {
-        'title': _titleController.text,
-        'body': _contentController.text,
+    final message = {
+      "to": "/topics/$topic",
+      "notification": {
+        "title": _titleController.text,
+        "body": _contentController.text,
+        "sound": "default",
       },
-      'data': {
-        'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-        'type': 'announcement',
+      "data": {
+        "click_action": "FLUTTER_NOTIFICATION_CLICK",
       },
     };
 
-    final response = await http.post(
-      Uri.parse(fcmEndpoint),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'key=$serverKey',
-      },
-      body: jsonEncode(notificationData),
-    );
-
-    if (response.statusCode == 200) {
-      print("Notification sent to $topic successfully.");
-    } else {
-      print("Error sending notification to $topic: ${response.body}");
+    try {
+      await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'key=$serverKey',
+        },
+        body: jsonEncode(message),
+      );
+    } catch (e) {
+      debugPrint("Error sending notification: $e");
     }
-  }*/
+  }
+
+  Future<void> subscribeToTopics() async {
+    if (isTeacher) {
+      return; // Teachers don't need to subscribe to student/parent topics
+    }
+
+    if (targetAudience.contains('students')) {
+      await FirebaseMessaging.instance.subscribeToTopic('students');
+    }
+
+    if (targetAudience.contains('parents')) {
+      await FirebaseMessaging.instance.subscribeToTopic('parents');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      // Redirect to login if no user is logged in
+      Future.microtask(() {
+        Navigator.pushReplacementNamed(context, '/login');
+      });
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
     if (!isTeacher) {
       return Scaffold(
         appBar: AppBar(title: Text("Create Announcement")),

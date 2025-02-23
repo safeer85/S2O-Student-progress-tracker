@@ -86,6 +86,17 @@ class _AddTeacherPageState extends State<AddTeacherPage> {
     showDialog(
       context: context,
       builder: (context) {
+        final currentUser = FirebaseAuth.instance.currentUser;
+
+        if (currentUser == null) {
+          // Redirect to login if no user is logged in
+          Future.microtask(() {
+            Navigator.pushReplacementNamed(context, '/login');
+          });
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
         return AlertDialog(
           title: const Text('Edit Teacher Details'),
           content: SingleChildScrollView(

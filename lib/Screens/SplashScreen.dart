@@ -1,18 +1,64 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:async'; // For Timer
 import 'package:animate_do/animate_do.dart';
 
+import '../Classes/User.dart';
+import 'Home.dart';
+import 'Login.dart';
+
 class SplashScreen extends StatelessWidget {
   const SplashScreen({Key? key}) : super(key: key);
+  Future<void> _navigateAfterDelay(BuildContext context) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
 
+      if (user != null) {
+        // Fetch user details from Firestore
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+
+        if (userDoc.exists) {
+          // Parse user document
+          Customuser customUser = Customuser.fromFirestore(
+            userDoc.data() as Map<String, dynamic>,
+            userDoc.id,
+          );
+
+          // Navigate to HomePage
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => HomePage(user: customUser),
+            ),
+          );
+          return;
+        }
+      }
+
+      // Navigate to LoginPage if no user is logged in or userDoc doesn't exist
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+    } catch (e) {
+      // Handle errors (e.g., Firestore issues)
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("An error occurred: $e")),
+      );
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+    }
+  }
   @override
   Widget build(BuildContext context) {
-    // Navigate to LoginPage after 3 seconds
-    Timer(const Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacementNamed('/login');
-    });
+
+    Future.delayed(const Duration(seconds: 3), () => _navigateAfterDelay(context));
 
     return Scaffold(
+
       body: Stack(
         children: [
           // Gradient Background with Decorations

@@ -61,6 +61,15 @@ class _StylishDrawerState extends State<StylishDrawer> {
   }
   @override
   Widget build(BuildContext context) {
+    if (user == null) {
+      // If no user is logged in, return a placeholder or prompt to log in.
+      return const Center(
+        child: Text(
+          'Please log in to access the menu.',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      );
+    }
     return FutureBuilder<Map<String, String>>(
       future: _userDetailsFuture,
       builder: (context, snapshot) {
@@ -144,47 +153,85 @@ class _StylishDrawerState extends State<StylishDrawer> {
       width: double.infinity,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.indigo, Colors.blueAccent],
+          colors: [Color(0xFF4A90E2), Color(0xFF007AFF)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
       ),
-      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          CircleAvatar(
-            radius: 45,
-            backgroundColor: Colors.white,
-            child: Icon(
-              Icons.person,
-              size: 50,
-              color: Colors.blueAccent,
-            ),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.white,
+                child: userDetails['profileImage'] != null
+                    ? ClipOval(
+                  child: Image.network(
+                    userDetails['profileImage']!,
+                    width: 90,
+                    height: 90,
+                    fit: BoxFit.cover,
+                  ),
+                )
+                    : const Icon(
+                  Icons.person,
+                  size: 60,
+                  color: Colors.blueAccent,
+                ),
+              ),
+              Positioned(
+                bottom: -4,
+                right: -4,
+                child: Icon(
+                  Icons.circle,
+                  size: 18,
+                  color: Colors.greenAccent,
+                ), // Optionally indicate active status.
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Text(
             userDetails['userName']!,
             style: const TextStyle(
-              fontSize: 20,
+              fontSize: 22,
               fontWeight: FontWeight.bold,
               color: Colors.white,
+              shadows: [
+                Shadow(
+                  offset: Offset(0, 1),
+                  blurRadius: 3,
+                  color: Colors.black26,
+                ),
+              ],
             ),
           ),
+          const SizedBox(height: 6),
           Text(
             userDetails['userEmail']!,
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 15,
               color: Colors.white70,
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            userDetails['userRole']!,
-            style: const TextStyle(
-              fontSize: 16,
-              fontStyle: FontStyle.italic,
-              color: Colors.white70,
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              userDetails['userRole']!,
+              style: const TextStyle(
+                fontSize: 14,
+                fontStyle: FontStyle.italic,
+                color: Colors.white,
+              ),
             ),
           ),
         ],
@@ -197,27 +244,45 @@ class _StylishDrawerState extends State<StylishDrawer> {
     required String iconPath,
     required String text,
     required VoidCallback onTap,
+    bool isSelected = false,
   }) {
     return Card(
-      elevation: 4,
+      elevation: isSelected ? 6 : 4, // Slightly higher elevation for the selected item
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16), // Larger radius for smoother edges
       ),
-      child: ListTile(
-        leading: SvgPicture.asset(
-          iconPath,
-          width: 24,
-          color: Colors.blueAccent,
-        ),
-        title: Text(
-          text,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
+      color: isSelected ? Colors.blueAccent.withOpacity(0.1) : Colors.white,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
         onTap: onTap,
+        splashColor: Colors.blueAccent.withOpacity(0.2),
+        highlightColor: Colors.blueAccent.withOpacity(0.1),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          child: Row(
+            children: [
+              SvgPicture.asset(
+                iconPath,
+                width: 28,
+                color: isSelected ? Colors.blueAccent : Colors.grey,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: isSelected ? Colors.blueAccent : Colors.black87,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
-
   // Logout Confirmation
   Future<void> _showLogoutConfirmation(BuildContext context) async {
     showModalBottomSheet(
