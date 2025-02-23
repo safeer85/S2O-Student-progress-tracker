@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class Attendance {
   String? id; // Firestore document ID
   String? teacherName;
